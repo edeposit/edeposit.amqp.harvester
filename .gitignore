@@ -1,0 +1,8 @@
+*.pyc
+dist/*
+src/edeposit.amqp.harvester.egg-info/*
+docs/_build
+MANIFEST
+*.html
+src/edeposit/amqp/harvester/aleph
+src/edeposit/amqp/harvester/decoders/aleph
