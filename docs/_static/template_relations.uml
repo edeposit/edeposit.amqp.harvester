@@ -1,0 +1,30 @@
+package scrappers {
+    class "grada_cz.py" as grada
+    class "ben_cz.py" as ben
+    class "zonerpress_cz.py" as zonerpress
+    class "cpress_cz.py" as cpress
+    class "_​_init__.py" as scrappersinit
+
+    cpress -u-> scrappersinit
+    zonerpress -u-> scrappersinit
+    grada -d-> scrappersinit
+    ben -d-> scrappersinit
+}
+
+package filters {
+    class "aleph_filter.py" as alephfilter
+    class "dup_filter.py" as dupfilter
+    class "_​_init__.py" as filtersinit
+    
+    alephfilter -u-> filtersinit
+    dupfilter -u-> filtersinit
+}
+
+class "settings.py" as settings
+class "structures.py" as structures
+class "_​_init__.py" as init
+
+filtersinit -u-> init
+scrappersinit -u-> init
+settings -r-> init
+structures -l-> init
