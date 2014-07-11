@@ -4,7 +4,7 @@
 # Interpreter version: python 2.7
 #
 # Imports =====================================================================
-
+from collections import namedtuple
 
 
 # Variables ===================================================================
@@ -12,7 +12,9 @@
 
 
 # Functions & objects =========================================================
-class Optionals(object):
+class Optionals(namedtuple("Optionals", ["sub_title", "format", "pub_date",
+                                         "pub_place", "ISBN", "description",
+                                         "ean", "language"])):
     def __init__(self):
         self.sub_title = None
         self.format = None
@@ -30,7 +32,8 @@ class Optionals(object):
         self.__dict__[attr] = val
 
 
-class Publication(object):
+class Publication(namedtuple("Publication", ["title", "author", "pages",
+                                             "price", "publisher"])):
     def __init__(self, title, author, pages, price, publisher):
         self.title = title
         self.author = author
@@ -39,3 +42,9 @@ class Publication(object):
         self.publisher = publisher
 
         self.optionals = Optionals()
+
+    def __setattr__(self, attr, val):
+        if attr not in self.__dict__:
+            setattr(self.optionals, attr, val)
+
+        self.__dict__[attr] = val
