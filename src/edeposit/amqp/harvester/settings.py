@@ -28,8 +28,8 @@ import os.path
 
 
 # Module configuration ========================================================
-
-#TODO: here will be configuration
+#: Cache for the deduplicator.
+DUP_FILTER_FILE = "/var/cache/edeposit_harvester/cache.json"
 
 # User configuration reader (don't edit this ==================================
 _ALLOWED = [str, int, float]
