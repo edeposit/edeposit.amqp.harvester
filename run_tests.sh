@@ -29,7 +29,7 @@ function run_int_tests {
 }
 
 function run_unit_tests {
-    supy.test "$TEST_PATH/unittests";
+    py.test "$TEST_PATH/unittests";
     exit
 }
 
