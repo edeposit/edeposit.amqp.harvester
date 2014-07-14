@@ -12,7 +12,14 @@
 
 
 # Functions & objects =========================================================
+def load_cache():
+    pass
 
+def save_cache(cache):
+    pass
+
+def deduplicate(publication):
+    pass
 
 
 # Main program ================================================================

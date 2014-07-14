@@ -7,10 +7,6 @@
 from collections import namedtuple
 
 
-# Variables ===================================================================
-
-
-
 # Functions & objects =========================================================
 class Optionals(object):
     def __init__(self):
