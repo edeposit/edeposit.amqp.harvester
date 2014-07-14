@@ -12,9 +12,7 @@ from collections import namedtuple
 
 
 # Functions & objects =========================================================
-class Optionals(namedtuple("Optionals", ["sub_title", "format", "pub_date",
-                                         "pub_place", "ISBN", "description",
-                                         "ean", "language"])):
+class Optionals(object):
     def __init__(self):
         self.sub_title = None
         self.format = None
@@ -25,15 +23,29 @@ class Optionals(namedtuple("Optionals", ["sub_title", "format", "pub_date",
         self.ean = None
         self.language = None
 
-    def __setattr__(self, attr, val):
-        if attr not in self.__dict__:
-            raise KeyError("%s is not allowed optional!" % attr)
+        self._any_set = False
+        self._all_set = True
 
-        self.__dict__[attr] = val
+    def __setattr__(self, key, val):
+        if "_all_set" in self.__dict__ and key not in self.__dict__:
+            raise ValueError(
+                "%s has no attribute %s!" % (self.__class__.__name__, key)
+            )
+
+        if not key.startswith("_") and key is not None:
+            self.__dict__["_any_set"] = True
+
+        self.__dict__[key] = val
+
+    def to_namedtuple(self):
+        keys = filter(lambda x: not x.startswith("_"), self.__dict__)
+        opt_nt = namedtuple(self.__class__.__name__, keys)
+        filtered_dict = dict(map(lambda x: (x, self.__dict__[x]), keys))
+
+        return opt_nt(**filtered_dict)
 
 
-class Publication(namedtuple("Publication", ["title", "author", "pages",
-                                             "price", "publisher"])):
+class Publication(object):
     def __init__(self, title, author, pages, price, publisher):
         self.title = title
         self.author = author
@@ -43,8 +55,25 @@ class Publication(namedtuple("Publication", ["title", "author", "pages",
 
         self.optionals = Optionals()
 
-    def __setattr__(self, attr, val):
-        if attr not in self.__dict__:
-            setattr(self.optionals, attr, val)
+        self._all_set = True
 
-        self.__dict__[attr] = val
+    def __setattr__(self, key, val):
+        if "_all_set" in self.__dict__ and key not in self.__dict__:
+            raise ValueError(
+                "%s has no attribute %s!" % (self.__class__.__name__, key)
+            )
+
+        self.__dict__[key] = val
+
+    def to_namedtuple(self):
+        keys = filter(lambda x: not x.startswith("_"), self.__dict__)
+        opt_nt = namedtuple(self.__class__.__name__, keys)
+
+        filt_dict = dict(map(lambda x: (x, self.__dict__[x]), keys))
+
+        if filt_dict["optionals"]._any_set:
+            filt_dict["optionals"] = filt_dict["optionals"].to_namedtuple()
+        else:
+            filt_dict["optionals"] = None
+
+        return opt_nt(**filt_dict)
