@@ -4,7 +4,9 @@
 # Interpreter version: python 2.7
 #
 # Imports =====================================================================
+import os
 import uuid
+import os.path
 
 from harvester import settings
 from harvester.filters import dup_filter
@@ -22,6 +24,8 @@ def test_save_cache():
 
     dup_filter.save_cache(DATA)
 
+    assert os.path.exists(settings.DUP_FILTER_FILE)
+
 
 def test_load_cache():
     data = dup_filter.load_cache()
@@ -38,3 +42,8 @@ def test_deduplicate():
 
     assert dup_filter.deduplicate(p) == p
     assert dup_filter.deduplicate(p) is None
+    assert dup_filter.deduplicate(p) is None
+
+
+def teardown_module():
+    os.remove(settings.DUP_FILTER_FILE)
