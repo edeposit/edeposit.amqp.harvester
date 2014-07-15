@@ -6,7 +6,7 @@
 """
 This submodule is used to skip already parsed data.
 
-Each `publication` parameter of the :func:`deduplicate` is cached and if it is
+Each `publication` parameter of the :func:`filter` is cached and if it is
 called with same parameter again, None is retuned.
 
 Note:
@@ -55,7 +55,7 @@ def load_cache():
         )
 
 
-def deduplicate(publication, cache=_CACHE):
+def filter(publication, cache=_CACHE):
     """
     Deduplication function, which compares `publication` with samples stored in
     `cache`. If the match NOT is found, `publication` is returned, else None.
