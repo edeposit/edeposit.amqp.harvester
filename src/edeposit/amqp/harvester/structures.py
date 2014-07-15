@@ -53,14 +53,6 @@ class Publication(object):
 
         self._all_set = True
 
-    def __setattr__(self, key, val):
-        if "_all_set" in self.__dict__ and key not in self.__dict__:
-            raise ValueError(
-                "%s has no attribute %s!" % (self.__class__.__name__, key)
-            )
-
-        self.__dict__[key] = val
-
     def to_namedtuple(self):
         keys = filter(lambda x: not x.startswith("_"), self.__dict__)
         opt_nt = namedtuple(self.__class__.__name__, keys)
@@ -73,3 +65,29 @@ class Publication(object):
             filt_dict["optionals"] = None
 
         return opt_nt(**filt_dict)
+
+    def _get_hash(self):  # TODO: improve robustness of hashing
+        return self.title + self.author
+
+    def __setattr__(self, key, val):
+        if "_all_set" in self.__dict__ and key not in self.__dict__:
+            raise ValueError(
+                "%s has no attribute %s!" % (self.__class__.__name__, key)
+            )
+
+        self.__dict__[key] = val
+
+    def __hash__(self):
+        return hash(self._get_hash())
+
+    def __eq__(self, other):
+        keys = filter(
+            lambda x: not x.startswith("_") and x != "optionals",
+            self.__dict__
+        )
+
+        for key in keys:
+            if getattr(self, key) != getattr(other, key):
+                return False
+
+        return True
