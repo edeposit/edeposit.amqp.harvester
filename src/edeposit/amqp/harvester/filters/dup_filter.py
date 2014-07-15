@@ -4,8 +4,15 @@
 # Interpreter version: python 2.7
 #
 """
-Module is using simple JSON serialization. For path to the serialized data,
-look at :attr:`settings.DUP_FILTER_FILE`.
+This submodule is used to skip already parsed data.
+
+Each `publication` parameter of the :func:`deduplicate` is cached and if it is
+called with same parameter again, None is retuned.
+
+Note:
+    Cache is using simple JSON serialization, so some form of cache persistency
+    is granted. For path to the serialized data, look at
+    :attr:`settings.DUP_FILTER_FILE`.
 """
 # Imports =====================================================================
 import json
