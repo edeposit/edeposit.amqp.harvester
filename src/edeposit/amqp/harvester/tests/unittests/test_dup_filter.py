@@ -40,9 +40,9 @@ def test_load_cache():
 def test_deduplicate():
     p = Publication("title", "author", "pages", "price", "publisher")
 
-    assert dup_filter.deduplicate(p) == p
-    assert dup_filter.deduplicate(p) is None
-    assert dup_filter.deduplicate(p) is None
+    assert dup_filter.filter(p) == p
+    assert dup_filter.filter(p) is None
+    assert dup_filter.filter(p) is None
 
 
 def teardown_module():
