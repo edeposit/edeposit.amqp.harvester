@@ -28,6 +28,13 @@ import os.path
 
 
 # Module configuration ========================================================
+
+#: Use duplication filter.
+USE_DUP_FILTER = True
+
+#: Use Aleph filter.
+USE_ALEPH_FILTER = True
+
 #: Cache for the deduplicator.
 DUP_FILTER_FILE = "/var/cache/edeposit_harvester/cache.json"
 
