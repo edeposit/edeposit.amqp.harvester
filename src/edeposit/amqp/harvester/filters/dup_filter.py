@@ -3,25 +3,71 @@
 #
 # Interpreter version: python 2.7
 #
+"""
+Module is using simple JSON serialization. For path to the serialized data,
+look at :attr:`settings.DUP_FILTER_FILE`.
+"""
 # Imports =====================================================================
+import json
+import os.path
 
+from .. import settings
 
 
 # Variables ===================================================================
-
+_CACHE = None
 
 
 # Functions & objects =========================================================
-def load_cache():
-    pass
-
 def save_cache(cache):
-    pass
+    """
+    Save cahce to the disk.
 
-def deduplicate(publication):
-    pass
+    Args:
+        cache (set): Set with cached data.
+    """
+    with open(settings.DUP_FILTER_FILE, "w") as f:
+        f.write(
+            json.dumps(list(cache))
+        )
 
 
-# Main program ================================================================
-if __name__ == '__main__':
-    pass
+def load_cache():
+    """
+    Load cache from the disk.
+
+    Return:
+        set: Deserialized data from disk.
+    """
+    if not os.path.exists(settings.DUP_FILTER_FILE):
+        return set()
+
+    with open(settings.DUP_FILTER_FILE) as f:
+        return set(
+            json.loads(f.read())
+        )
+
+
+def deduplicate(publication, cache=_CACHE):
+    """
+    Deduplication function, which compares `publication` with samples stored in
+    `cache`. If the match NOT is found, `publication` is returned, else None.
+
+    Args:
+        publication (obj): :class:`structures.Publication` instance.
+        cache (obj): Cache which is used for lookups.
+
+    Returns:
+        obj/None: Depends whether the object is found in cache or not.
+    """
+    if cache is None:
+        cache = load_cache()
+
+    if publication._get_hash() in cache:
+        return None
+
+    cache.update(
+        [publication._get_hash()]
+    )
+    save_cache(cache)
+    return publication
