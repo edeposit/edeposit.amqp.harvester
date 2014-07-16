@@ -64,12 +64,15 @@ def compare_names(first, second):
 
     zipped = zip(first, second)
 
+    if not zipped:
+        return 0
+
     similarity_factor = 0
     for fitem, sitem in zipped:
         if fitem == sitem:
             similarity_factor += 1
 
-    return (float(similarity_factor)/len(zipped)) * 100
+    return (float(similarity_factor) / len(zipped)) * 100
 
 
 def filter_publication(publication):
@@ -86,7 +89,19 @@ def filter_publication(publication):
     if not result.records:
         return publication
 
-    # TODO: filter by author name
-    if not isbn_query:
-        pass
+    # if there was results with this ISBN, compare titles of the books
+    # (sometimes, there are different books with same ISBN because of human
+    # errors)
+    if isbn_query:
+        for record in result.records:
+            epub = record.epublication
+
+            if compare_names(epub.nazev, publication.title) >= 80:
+                return None
+
+        return publication
+
+    # compare authors name
+    for record in result.records:
+        epub = record.epublication
 
