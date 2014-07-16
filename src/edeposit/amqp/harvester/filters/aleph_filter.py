@@ -27,7 +27,7 @@ def name_to_vector(name):
     Args:
         name (str): Name which will be vectorized.
 
-    Returns:
+    Returns: 
         list: Vector created from name.
     """
     if not isinstance(name, unicode):
@@ -78,6 +78,8 @@ def compare_names(first, second):
 def filter_publication(publication):
     query = None
     isbn_query = False
+
+    # there can be ISBN query or book title query
     if publication.optionals and publication.optionals.ISBN:
         query = aleph.ISBNQuery(publication.optionals.ISBN)
         isbn_query = True
@@ -87,7 +89,7 @@ def filter_publication(publication):
     result = aleph.reactToAMQPMessage(aleph.SearchRequest(query), "")
 
     if not result.records:
-        return publication
+        return publication  # book is not in database
 
     # if there was results with this ISBN, compare titles of the books
     # (sometimes, there are different books with same ISBN because of human
@@ -96,8 +98,9 @@ def filter_publication(publication):
         for record in result.records:
             epub = record.epublication
 
+            # try to match title of the book
             if compare_names(epub.nazev, publication.title) >= 80:
-                return None
+                return None  # book already in database
 
         return publication
 
@@ -105,3 +108,26 @@ def filter_publication(publication):
     for record in result.records:
         epub = record.epublication
 
+        # if the title doens't match, go to next record from aleph
+        if not compare_names(epub.nazev, publication.title) >= 80:
+            continue
+
+        for author in epub.autori:
+            # convert Aleph's author structure to string
+            author_str = "%s %s %s" % (
+                author.firstName,
+                author.lastName,
+                author.title
+            )
+
+            # normalize author data from `publication`
+            pub_authors = publication.author
+            if type(publication.author) in [str, unicode]:
+                pub_authors = [publication.author]
+
+            # try to compare authors from `publication` and Aleph
+            for pub_author in pub_authors:
+                if compare_names(author_str, pub_author):
+                    return None  # book already in database
+
+    return publication  # book is not in database
