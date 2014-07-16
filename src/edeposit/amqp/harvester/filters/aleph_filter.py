@@ -68,14 +68,24 @@ def compare_names(first, second):
         return 0
 
     similarity_factor = 0
-    for fitem, sitem in zipped:
-        if fitem == sitem:
+    for fitem, _ in zipped:
+        if fitem in second:
             similarity_factor += 1
 
     return (float(similarity_factor) / len(zipped)) * 100
 
 
 def filter_publication(publication):
+    """
+    Filter publications based at data from Aleph.
+
+    Args:
+        publication (obj): :class:`structures.Publication` instance.
+
+    Returns:
+        obj/None: None if the publication was found in Aleph or `publication` \
+                  if not.
+    """
     query = None
     isbn_query = False
 
@@ -127,7 +137,7 @@ def filter_publication(publication):
 
             # try to compare authors from `publication` and Aleph
             for pub_author in pub_authors:
-                if compare_names(author_str, pub_author):
+                if compare_names(author_str, pub_author) >= 50:
                     return None  # book already in database
 
     return publication  # book is not in database
