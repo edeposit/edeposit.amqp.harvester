@@ -13,10 +13,10 @@ from harvester.structures import Publication
 
 
 # Functions & objects =========================================================
-def test_filter():
+def test_filter_publication():
     p = Publication("title", "author", "pages", "price", "publisher")
 
-    assert aleph_filter.filter(p) == p
+    assert aleph_filter.filter_publication(p) == p
 
     p = Publication(
         "Umění programování v unixu",
@@ -26,4 +26,4 @@ def test_filter():
         "publisher"
     )
 
-    assert aleph_filter.filter(p) is None
+    assert aleph_filter.filter_publication(p) is None

@@ -55,7 +55,7 @@ def load_cache():
         )
 
 
-def filter(publication, cache=_CACHE):
+def filter_publication(publication, cache=_CACHE):
     """
     Deduplication function, which compares `publication` with samples stored in
     `cache`. If the match NOT is found, `publication` is returned, else None.
