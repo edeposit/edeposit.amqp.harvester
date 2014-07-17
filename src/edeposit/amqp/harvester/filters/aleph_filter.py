@@ -3,16 +3,17 @@
 #
 # Interpreter version: python 2.7
 #
+"""
+This module is used to skip Publications, which are already in Aleph.
+
+Note:
+    The module is using fuzzy lookup, see :func:`name_to_vector` and
+    :func:`compare_names`.
+"""
 # Imports =====================================================================
 import unicodedata
 
 import edeposit.amqp.aleph as aleph
-
-# from .. import settings
-
-
-# Variables ===================================================================
-
 
 
 # Functions & objects =========================================================
@@ -27,7 +28,7 @@ def name_to_vector(name):
     Args:
         name (str): Name which will be vectorized.
 
-    Returns: 
+    Returns:
         list: Vector created from name.
     """
     if not isinstance(name, unicode):
@@ -75,7 +76,7 @@ def compare_names(first, second):
     return (float(similarity_factor) / len(zipped)) * 100
 
 
-def filter_publication(publication):
+def filter_publication(publication, cmp_authors=True):
     """
     Filter publications based at data from Aleph.
 
@@ -114,7 +115,7 @@ def filter_publication(publication):
 
         return publication
 
-    # compare authors name
+    # checks whether the details from returned EPublication match Publication's
     for record in result.records:
         epub = record.epublication
 
@@ -122,6 +123,10 @@ def filter_publication(publication):
         if not compare_names(epub.nazev, publication.title) >= 80:
             continue
 
+        if not cmp_authors:
+            return None  # book already in database
+
+        # compare authors names
         for author in epub.autori:
             # convert Aleph's author structure to string
             author_str = "%s %s %s" % (
