@@ -13,10 +13,11 @@ See :attr:`._SETTINGS_PATH` for details.
 Note:
     If the first path is found, other is ignored.
 
-Example of the configuration file (``$HOME/edeposit/ltp.json``)::
+Example of the configuration file (``$HOME/edeposit/harvester.json``)::
 
     {
-        "USE_CLAMD": false
+        "USE_DUP_FILTER": false,
+        "USE_ALEPH_FILTER": false
     }
 
 Attributes
@@ -45,7 +46,7 @@ DUP_FILTER_FILE = "/var/cache/edeposit_harvester/cache.json"
 # User configuration reader (don't edit this ==================================
 _ALLOWED = [str, int, float]
 
-_SETTINGS_PATH = "/edeposit/ltp.json"
+_SETTINGS_PATH = "/edeposit/harvester.json"
 """
 Path which is appended to default search paths (``$HOME`` and ``/etc``).
 
