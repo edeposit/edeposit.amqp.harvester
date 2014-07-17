@@ -14,16 +14,44 @@ from harvester.structures import Publication
 
 # Functions & objects =========================================================
 def test_filter_publication():
-    p = Publication("title", "author", "pages", "price", "publisher")
+    p = Publication("ajksdhaklsjdh", "author", "pages", "price", "publisher")
 
-    assert aleph_filter.filter_publication(p) == p
+    assert aleph_filter.filter_publication(p) == p  # not found
 
+    # check lookup by book title
     p = Publication(
         "Umění programování v unixu",
-        "author",
-        "pages",
-        "price",
-        "publisher"
+        "random",
+        "",
+        "",
+        ""
     )
+    assert aleph_filter.filter_publication(p, cmp_authors=False) == None  # found
 
-    assert aleph_filter.filter_publication(p) is None
+    # check lookup by title and authors name
+    p = Publication(
+        "Umění programování v unixu",
+        "Raymond",  # !
+        "",
+        "",
+        ""
+    )
+    assert aleph_filter.filter_publication(p) == None  # found
+
+    # lookup by ISBN
+    p = Publication(
+        "",
+        "",  # !
+        "",
+        "",
+        ""
+    )
+    p.optionals.ISBN = "80-86056-31-7"
+    assert aleph_filter.filter_publication(p) == p  # not found
+
+    p.title = "Zen a umění internetu"
+    assert aleph_filter.filter_publication(p) == None  # found
+
+    # lookup by ISBN with typo in title
+    p.title = "Zen a umění intrnetu"  # typo
+    assert aleph_filter.filter_publication(p) == p  # not found
