@@ -81,6 +81,9 @@ class Publication(object):
         return hash(self._get_hash())
 
     def __eq__(self, other):
+        if not other:
+            return False
+
         keys = filter(
             lambda x: not x.startswith("_") and x != "optionals",
             self.__dict__
