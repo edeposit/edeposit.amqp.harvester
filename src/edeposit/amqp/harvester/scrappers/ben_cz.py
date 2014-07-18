@@ -80,6 +80,15 @@ def _parse_publisher(details):
     return publisher
 
 
+def _parse_price(details):
+    price = details.find("td", {"id": "ctl00_ContentPlaceHolder1_TableCell10"})
+
+    if not price:
+        return None
+
+    return price[0].getContent().strip()
+
+
 def _process_book(book_url):
     data = DOWNER.download(book_url)
     dom = dhtmlparser.parseString(data)
@@ -97,6 +106,7 @@ def _process_book(book_url):
     # print _parse_title(dom, details)
     # print _parse_authors(details)
     # print _parse_publisher(details)
+    # print _parse_price(details)
 
 
     # pub = Publication(title, author, pages, price, publisher)
