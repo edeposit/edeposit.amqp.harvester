@@ -82,7 +82,9 @@ setup(
     zip_safe=False,
     install_requires=[
         'setuptools',
-        'edeposit.amqp.aleph'
+        'httpkie',
+        'dhtmlparser',
+        'edeposit.amqp.aleph',
     ],
     extras_require={
         "test": [
