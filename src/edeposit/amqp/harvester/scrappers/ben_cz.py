@@ -25,7 +25,6 @@ DOWNER.cookies = {
 }
 
 
-
 # Functions & objects =========================================================
 def _parse_title(dom, details):
     title = details.find("h1")
@@ -40,7 +39,7 @@ def _parse_title(dom, details):
     return title[0].getContent().strip()
 
 
-def _parse_authors(dom, details):
+def _parse_authors(details):
     authors = details.find(
         "tr",
         {"id": "ctl00_ContentPlaceHolder1_tblRowAutor"}
@@ -62,6 +61,25 @@ def _parse_authors(dom, details):
     return author_list
 
 
+def _parse_publisher(details):
+    publisher = details.find(
+        "td",
+        {"id": "ctl00_ContentPlaceHolder1_TableCell3"}
+    )
+
+    # publisher is not specified
+    if not publisher:
+        return None
+
+    publisher = dhtmlparser.removeTags(publisher[0]).strip()
+
+    # return None instead of blank string
+    if not publisher:
+        return None
+
+    return publisher
+
+
 def _process_book(book_url):
     data = DOWNER.download(book_url)
     dom = dhtmlparser.parseString(data)
@@ -77,7 +95,8 @@ def _process_book(book_url):
     # print details
 
     # print _parse_title(dom, details)
-    print _parse_authors(dom, details)
+    # print _parse_authors(details)
+    # print _parse_publisher(details)
 
 
     # pub = Publication(title, author, pages, price, publisher)
