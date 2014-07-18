@@ -61,9 +61,9 @@ class Optionals(object):
 
 
 class Publication(object):
-    def __init__(self, title, author, pages, price, publisher):
+    def __init__(self, title, authors, pages, price, publisher):
         self.title = title
-        self.author = author
+        self.authors = authors
         self.pages = pages
         self.price = price
         self.publisher = publisher
@@ -78,6 +78,15 @@ class Publication(object):
 
         filt_dict = dict(map(lambda x: (x, self.__dict__[x]), keys))
 
+        # convert Author objects to namedtuple
+        authors = []
+        for author in filt_dict["authors"]:
+            authors.append(
+                author.to_namedtuple()
+            )
+        filt_dict["authors"] = authors
+
+        # convert optionals to namedtuple if set, or to None if not
         if filt_dict["optionals"]._any_set:
             filt_dict["optionals"] = filt_dict["optionals"].to_namedtuple()
         else:
