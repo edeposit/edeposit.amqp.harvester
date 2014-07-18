@@ -89,6 +89,30 @@ def _parse_price(details):
     return price[0].getContent().strip()
 
 
+def _parse_pages_binding(details):
+    pages = details.find(
+        "tr",
+        {"id": "ctl00_ContentPlaceHolder1_tblRowRozsahVazba"}
+    )
+
+    if not pages:
+        return None
+
+    pages = pages[0].find("td")
+
+    if not pages:
+        return None
+
+    pages = pages[-1].getContent().strip()
+
+    binding = None
+    if "/" in pages:
+        binding = pages.split("/")[1]
+        pages = pages.split("/")[0]
+
+    return pages.strip(), binding.strip()
+
+
 def _process_book(book_url):
     data = DOWNER.download(book_url)
     dom = dhtmlparser.parseString(data)
@@ -100,16 +124,26 @@ def _process_book(book_url):
     details = details[0]
 
     # parse required informations
+    title = _parse_title(dom, details)
+    author = _parse_authors(details)
+    publisher = _parse_publisher(details)
+    price = _parse_price(details)
+    pages, binding = _parse_pages_binding(details)
 
-    # print details
+    pub = Publication(
+        title,
+        author,
+        pages,
+        price,
+        publisher
+    )
 
-    # print _parse_title(dom, details)
-    # print _parse_authors(details)
-    # print _parse_publisher(details)
-    # print _parse_price(details)
+    # parse optional informations
+    pub.optionals.binding = binding
 
+    
 
-    # pub = Publication(title, author, pages, price, publisher)
+    print pub.to_namedtuple()
 
 
 def parse_publications():
