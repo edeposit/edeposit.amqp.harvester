@@ -18,6 +18,7 @@ class Optionals(object):
         self.description = None
         self.ean = None
         self.language = None
+        self.edition = None  # vydání
 
         self._any_set = False
         self._all_set = True
