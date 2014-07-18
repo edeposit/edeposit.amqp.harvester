@@ -96,12 +96,12 @@ def _parse_pages_binding(details):
     )
 
     if not pages:
-        return None
+        return None, None
 
     pages = pages[0].find("td")
 
     if not pages:
-        return None
+        return None, None
 
     pages = pages[-1].getContent().strip()
 
@@ -111,6 +111,18 @@ def _parse_pages_binding(details):
         pages = pages.split("/")[0]
 
     return pages.strip(), binding.strip()
+
+
+def _parse_ISBN(details):
+    pass
+
+
+def _parse_edition(details):
+    pass
+
+
+def _parse_description(details):
+    pass
 
 
 def _process_book(book_url):
@@ -125,23 +137,22 @@ def _process_book(book_url):
 
     # parse required informations
     title = _parse_title(dom, details)
-    author = _parse_authors(details)
+    authors = _parse_authors(details)
     publisher = _parse_publisher(details)
     price = _parse_price(details)
     pages, binding = _parse_pages_binding(details)
 
     pub = Publication(
         title,
-        author,
+        authors,
         pages,
         price,
         publisher
     )
 
     # parse optional informations
+    pub.optionals.url = book_url
     pub.optionals.binding = binding
-
-    
 
     print pub.to_namedtuple()
 
