@@ -36,6 +36,7 @@ class Optionals(object):
         self.language = None
         self.edition = None  # vydání
         self.url = None
+        self.binding = None
 
         self._any_set = False
         self._all_set = True
