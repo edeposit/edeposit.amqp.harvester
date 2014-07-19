@@ -107,14 +107,42 @@ def _parse_pages_binding(details):
 
     binding = None
     if "/" in pages:
-        binding = pages.split("/")[1]
-        pages = pages.split("/")[0]
+        binding = pages.split("/")[1].strip()
+        pages = pages.split("/")[0].strip()
 
-    return pages.strip(), binding.strip()
+    return pages, binding
 
 
-def _parse_ISBN(details):
-    pass
+def _parse_ISBN_EAN(details):
+    isbn_row = details.find(
+        "tr",
+        {"id": "ctl00_ContentPlaceHolder1_tblRowIsbnEan"}
+    )
+
+    if not isbn_row:
+        return None, None
+
+    isbn_row = isbn_row[0].find("td")
+
+    if not isbn_row:
+        return None, None
+
+    isbn_ean = isbn_row[-1].getContent().strip()
+
+    # if content of the tag is blank
+    if not isbn_ean:
+        return None, None
+
+    ean = None
+    isbn = None
+    if "/" in isbn_ean:
+        isbn, ean = isbn_ean.split("/")
+        isbn = isbn.strip()
+        ean = ean.strip()
+    else:
+        isbn = isbn_ean.strip()
+
+    return isbn, ean
 
 
 def _parse_edition(details):
@@ -154,7 +182,9 @@ def _process_book(book_url):
     pub.optionals.url = book_url
     pub.optionals.binding = binding
 
-    print pub.to_namedtuple()
+    pub.optionals.ISBN, pub.optionals.EAN = _parse_ISBN_EAN(details)
+
+    # print pub.to_namedtuple()
 
 
 def parse_publications():
@@ -165,15 +195,14 @@ def parse_publications():
 
     assert book_list, "Can't find <div> with class 'seznamKniha'!"
 
-    for html_chunk in book_list[4:]:
+    for html_chunk in book_list[4:]:  # TODO: remove
         a = html_chunk.find("a")
 
         assert a, "Can't find link to the details of the book!"
 
-
         _process_book(a[0].params["href"])
 
-        break
+        break  # TODO: remove
 
 def self_test():
     pass
