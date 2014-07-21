@@ -4,6 +4,8 @@
 # Interpreter version: python 2.7
 #
 # Imports =====================================================================
+import traceback
+
 import httpkie
 import dhtmlparser
 
@@ -95,7 +97,7 @@ def _parse_authors(details):
     )
 
     if not authors:
-        return None  # book with unspecified authors
+        return []  # book with unspecified authors
 
     # parse authors from HTML and convert them to Author objects
     author_list = []
@@ -285,13 +287,13 @@ def self_test():
             error += str(book.to_namedtuple())
 
             assert book.title, error
-            assert book.authors, error
+            assert book.authors is not None, error  # can be blank
             assert book.pages, error
             assert book.price, error
             assert book.publisher, error
 
     except Exception, e:
-        return e.message
+        return e.message + "\n---\n" + traceback.format_exc().strip()
 
     return True
 
