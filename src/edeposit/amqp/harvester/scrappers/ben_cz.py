@@ -27,6 +27,15 @@ DOWNER.cookies = {
 
 # Functions & objects =========================================================
 def _get_last_td(el):
+    """
+    Return last <td> found in `el` DOM.
+
+    Args:
+        el (obj): :class:`dhtmlparser.HTMLElement` instance.
+
+    Returns:
+        obj: HTMLElement instance if found, or None if there are no <td> tags.
+    """
     if not el:
         return None
 
@@ -39,6 +48,16 @@ def _get_last_td(el):
 
 
 def _get_td_or_none(details, ID):
+    """
+    Get <tr> tag with given `ID` and return last <td> tag from it's content.
+
+    Args:
+        details (obj): :class:`dhtmlparser.HTMLElement` instance.
+        ID (str): id property of the <tr> tag.
+
+    Returns:
+        obj: HTMLElement contaning pointer to last <td> tag or None.
+    """
     content = details.find("tr", {"id": ID})
     content = _get_last_td(content)
 
@@ -128,7 +147,7 @@ def _parse_pages_binding(details):
     if not pages:
         return None, None
 
-    binding = None
+    binding = None  # binding info and number of pages is stored in same string
     if "/" in pages:
         binding = pages.split("/")[1].strip()
         pages = pages.split("/")[0].strip()
@@ -147,7 +166,7 @@ def _parse_ISBN_EAN(details):
 
     ean = None
     isbn = None
-    if "/" in isbn_ean:
+    if "/" in isbn_ean:  # ISBN and EAN are stored in same string
         isbn, ean = isbn_ean.split("/")
         isbn = isbn.strip()
         ean = ean.strip()
@@ -169,19 +188,24 @@ def _parse_edition(details):
 def _parse_description(details):
     description = details.find("div", {"class": "detailPopis"})
 
+    # description not found
     if not description:
         return None
 
+    # remove links to ebook version
     ekniha = description[0].find("div", {"class": "ekniha"})
     if ekniha:
         ekniha[0].replaceWith(dhtmlparser.HTMLElement(""))
 
+    # remove links to other books from same cathegory
     detail = description[0].find("p", {"class": "detailKat"})
     if detail:
         detail[0].replaceWith(dhtmlparser.HTMLElement(""))
 
+    # remove all HTML elements
     description = dhtmlparser.removeTags(description[0]).strip()
 
+    # description is blank
     if not description:
         return None
 
@@ -189,6 +213,15 @@ def _parse_description(details):
 
 
 def _process_book(book_url):
+    """
+    Parse available informations about book from the book details page.
+
+    Args:
+        book_url (str): Absolute URL of the book.
+
+    Returns:
+        obj: :class:`structures.Publication` instance with book details.
+    """
     data = DOWNER.download(book_url)
     dom = dhtmlparser.parseString(data)
 
@@ -218,8 +251,10 @@ def _process_book(book_url):
     pub.optionals.binding = binding
 
     pub.optionals.ISBN, pub.optionals.EAN = _parse_ISBN_EAN(details)
+    pub.optionals.edition = _parse_edition(details)
+    pub.optionals.description = _parse_description(details)
 
-    print _parse_description(details)
+    return pub
 
 
 def parse_publications():
