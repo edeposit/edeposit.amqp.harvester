@@ -32,7 +32,7 @@ class Optionals(object):
         self.pub_place = None
         self.ISBN = None
         self.description = None
-        self.ean = None
+        self.EAN = None
         self.language = None
         self.edition = None  # vydání
         self.url = None
