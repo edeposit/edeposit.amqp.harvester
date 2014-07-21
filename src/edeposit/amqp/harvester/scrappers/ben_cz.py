@@ -167,7 +167,25 @@ def _parse_edition(details):
 
 
 def _parse_description(details):
-    pass
+    description = details.find("div", {"class": "detailPopis"})
+
+    if not description:
+        return None
+
+    ekniha = description[0].find("div", {"class": "ekniha"})
+    if ekniha:
+        ekniha[0].replaceWith(dhtmlparser.HTMLElement(""))
+
+    detail = description[0].find("p", {"class": "detailKat"})
+    if detail:
+        detail[0].replaceWith(dhtmlparser.HTMLElement(""))
+
+    description = dhtmlparser.removeTags(description[0]).strip()
+
+    if not description:
+        return None
+
+    return description
 
 
 def _process_book(book_url):
@@ -201,7 +219,7 @@ def _process_book(book_url):
 
     pub.optionals.ISBN, pub.optionals.EAN = _parse_ISBN_EAN(details)
 
-    print pub.to_namedtuple()
+    print _parse_description(details)
 
 
 def parse_publications():
