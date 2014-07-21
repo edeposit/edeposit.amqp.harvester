@@ -265,16 +265,34 @@ def parse_publications():
 
     assert book_list, "Can't find <div> with class 'seznamKniha'!"
 
-    for html_chunk in book_list[4:]:  # TODO: remove
+    books = []
+    for html_chunk in book_list:
         a = html_chunk.find("a")
 
         assert a, "Can't find link to the details of the book!"
 
-        _process_book(a[0].params["href"])
+        books.append(
+            _process_book(a[0].params["href"])
+        )
 
-        break  # TODO: remove
+    return books
+
 
 def self_test():
-    pass
+    try:
+        for book in parse_publications():
+            error = "Book doesn't have all required parameters!\n"
+            error += str(book.to_namedtuple())
 
-parse_publications()
+            assert book.title, error
+            assert book.authors, error
+            assert book.pages, error
+            assert book.price, error
+            assert book.publisher, error
+
+    except Exception, e:
+        return e.message
+
+    return True
+
+print self_test()
