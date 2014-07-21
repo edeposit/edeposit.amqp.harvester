@@ -26,6 +26,36 @@ DOWNER.cookies = {
 
 
 # Functions & objects =========================================================
+def _get_last_td(el):
+    if not el:
+        return None
+
+    last = el[0].find("td")
+
+    if not last:
+        return None
+
+    return last[-1]
+
+
+def _get_td_or_none(details, ID):
+    content = details.find("tr", {"id": ID})
+    content = _get_last_td(content)
+
+    # if content is None, return it
+    if not content:
+        return None
+
+    content = content.getContent().strip()
+
+    # if content is blank string, return None
+    if not content:
+        return None
+
+    return content
+
+
+# Parsers =====================================================================
 def _parse_title(dom, details):
     title = details.find("h1")
 
@@ -81,29 +111,22 @@ def _parse_publisher(details):
 
 
 def _parse_price(details):
-    price = details.find("td", {"id": "ctl00_ContentPlaceHolder1_TableCell10"})
+    price = _get_td_or_none(
+        details,
+        "ctl00_ContentPlaceHolder1_tblRowBeznaCena"
+    )
 
-    if not price:
-        return None
-
-    return price[0].getContent().strip()
+    return price
 
 
 def _parse_pages_binding(details):
-    pages = details.find(
-        "tr",
-        {"id": "ctl00_ContentPlaceHolder1_tblRowRozsahVazba"}
+    pages = _get_td_or_none(
+        details,
+        "ctl00_ContentPlaceHolder1_tblRowRozsahVazba"
     )
 
     if not pages:
         return None, None
-
-    pages = pages[0].find("td")
-
-    if not pages:
-        return None, None
-
-    pages = pages[-1].getContent().strip()
 
     binding = None
     if "/" in pages:
@@ -114,22 +137,11 @@ def _parse_pages_binding(details):
 
 
 def _parse_ISBN_EAN(details):
-    isbn_row = details.find(
-        "tr",
-        {"id": "ctl00_ContentPlaceHolder1_tblRowIsbnEan"}
+    isbn_ean = _get_td_or_none(
+        details,
+        "ctl00_ContentPlaceHolder1_tblRowIsbnEan"
     )
 
-    if not isbn_row:
-        return None, None
-
-    isbn_row = isbn_row[0].find("td")
-
-    if not isbn_row:
-        return None, None
-
-    isbn_ean = isbn_row[-1].getContent().strip()
-
-    # if content of the tag is blank
     if not isbn_ean:
         return None, None
 
@@ -146,7 +158,12 @@ def _parse_ISBN_EAN(details):
 
 
 def _parse_edition(details):
-    pass
+    edition = _get_td_or_none(
+        details,
+        "ctl00_ContentPlaceHolder1_tblRowVydani"
+    )
+
+    return edition
 
 
 def _parse_description(details):
@@ -184,7 +201,7 @@ def _process_book(book_url):
 
     pub.optionals.ISBN, pub.optionals.EAN = _parse_ISBN_EAN(details)
 
-    # print pub.to_namedtuple()
+    print pub.to_namedtuple()
 
 
 def parse_publications():
