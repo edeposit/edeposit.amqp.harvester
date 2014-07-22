@@ -63,10 +63,16 @@ class Optionals(object):
 class Publication(object):
     def __init__(self, title, authors, pages, price, publisher):
         self.title = title
-        self.authors = authors
         self.pages = pages
         self.price = price
         self.publisher = publisher
+
+        if type(authors) in [str, unicode]:
+            self.authors = [Author(authors)]
+        elif type(authors) not in [list, set, tuple]:
+            self.authors = [authors]
+        else:
+            self.authors = authors
 
         self.optionals = Optionals()
 
@@ -81,9 +87,8 @@ class Publication(object):
         # convert Author objects to namedtuple
         authors = []
         for author in filt_dict["authors"]:
-            authors.append(
-                author.to_namedtuple()
-            )
+            authors.append(author.to_namedtuple())
+
         filt_dict["authors"] = authors
 
         # convert optionals to namedtuple if set, or to None if not
@@ -95,7 +100,10 @@ class Publication(object):
         return opt_nt(**filt_dict)
 
     def _get_hash(self):  # TODO: improve robustness of hashing
-        return self.title + self.author
+        if self.optionals and self.optionals.ISBN:
+            return self.optionals.ISBN
+
+        return self.title + ",".join(map(lambda x: x.name, self.authors))
 
     def __setattr__(self, key, val):
         if "_all_set" in self.__dict__ and key not in self.__dict__:

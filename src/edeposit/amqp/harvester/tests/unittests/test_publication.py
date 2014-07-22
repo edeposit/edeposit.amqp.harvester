@@ -6,16 +6,16 @@
 # Imports =====================================================================
 import pytest
 
-from harvester.structures import Publication
+from harvester.structures import Publication, Author
 
 
 # Functions & objects =========================================================
 def test_publication():
-    p = Publication("title", "author", "pages", "price", "publisher")
+    p = Publication("title", [Author("author")], "pages", "price", "publisher")
 
     # test properties of the Publication object
     assert p.title == "title"
-    assert p.author == "author"
+    assert p.authors[0].name == "author"
     assert p.pages == "pages"
     assert p.price == "price"
     assert p.publisher == "publisher"
@@ -29,7 +29,7 @@ def test_publication():
     # test properties of generated namedtuple
     nt = p.to_namedtuple()
     assert nt.title == "title"
-    assert nt.author == "author"
+    assert nt.authors[0].name == "author"
     assert nt.pages == "pages"
     assert nt.price == 1
     assert nt.publisher == "publisher"
@@ -38,7 +38,7 @@ def test_publication():
 
     # test that optionals can prevent setting themself to None if anything is
     # set in them
-    p.optionals.ean = "xex"
+    p.optionals.EAN = "xex"
     nt = p.to_namedtuple()
     assert nt.optionals is not None
-    nt.optionals.ean == "xex"
+    nt.optionals.EAN == "xex"

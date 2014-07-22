@@ -136,9 +136,9 @@ def filter_publication(publication, cmp_authors=True):
             )
 
             # normalize author data from `publication`
-            pub_authors = publication.author
-            if type(publication.author) in [str, unicode]:
-                pub_authors = [publication.author]
+            pub_authors = map(lambda x: x.name, publication.authors)
+            if type(pub_authors) not in [list, tuple, set]:
+                pub_authors = [pub_authors]
 
             # try to compare authors from `publication` and Aleph
             for pub_author in pub_authors:

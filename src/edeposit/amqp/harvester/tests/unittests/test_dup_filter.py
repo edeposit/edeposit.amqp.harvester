@@ -10,7 +10,7 @@ import os.path
 
 from harvester import settings
 from harvester.filters import dup_filter
-from harvester.structures import Publication
+from harvester.structures import Publication, Author
 
 
 # Variables ===================================================================
@@ -38,7 +38,7 @@ def test_load_cache():
 
 
 def test_deduplicate():
-    p = Publication("title", "author", "pages", "price", "publisher")
+    p = Publication("title", [Author("author")], "pages", "price", "publisher")
 
     assert dup_filter.filter_publication(p) == p
     assert dup_filter.filter_publication(p) is None
