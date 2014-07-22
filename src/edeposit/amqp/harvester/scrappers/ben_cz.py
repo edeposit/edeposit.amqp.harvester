@@ -158,6 +158,9 @@ def _parse_pages_binding(details):
         binding = pages.split("/")[1].strip()
         pages = pages.split("/")[0].strip()
 
+    if not pages:
+        pages = None
+
     return pages, binding
 
 
@@ -178,6 +181,9 @@ def _parse_ISBN_EAN(details):
         ean = ean.strip()
     else:
         isbn = isbn_ean.strip()
+
+    if not isbn:
+        isbn = None
 
     return isbn, ean
 
