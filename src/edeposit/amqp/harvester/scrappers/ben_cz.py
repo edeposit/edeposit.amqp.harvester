@@ -4,8 +4,6 @@
 # Interpreter version: python 2.7
 #
 # Imports =====================================================================
-import traceback
-
 import httpkie
 import dhtmlparser
 
@@ -291,20 +289,18 @@ def parse_publications():  # TODO: skip not yet published
 
 
 def self_test():
-    try:
-        for book in parse_publications():
-            error = "Book doesn't have all required parameters!\n"
-            error += str(book.to_namedtuple())
+    books = parse_publications()
 
-            assert book.title, error
-            assert book.authors is not None, error  # can be blank
-            assert book.pages, error
-            assert book.price, error
-            assert book.publisher, error
+    assert len(books) > 0
 
-    except Exception, e:
-        return e.message + "\n---\n" + traceback.format_exc().strip()
+    for book in parse_publications():
+        error = "Book doesn't have all required parameters!\n"
+        error += str(book.to_namedtuple())
+
+        assert book.title, error
+        assert book.authors is not None, error  # can be blank
+        assert book.pages, error
+        assert book.price, error
+        assert book.publisher, error
 
     return True
-
-# print self_test()

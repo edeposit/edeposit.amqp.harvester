@@ -4,17 +4,16 @@
 # Interpreter version: python 2.7
 #
 # Imports =====================================================================
+import traceback
 
-
-
-# Variables ===================================================================
-
+import ben_cz
 
 
 # Functions & objects =========================================================
-
-
-
-# Main program ================================================================
-if __name__ == '__main__':
-    pass
+def self_test_all():
+    try:
+        ben_cz.self_test()
+    except Exception, e:
+        raise UserWarning(
+            e.message + "\n---\n" + traceback.format_exc().strip()
+        )
