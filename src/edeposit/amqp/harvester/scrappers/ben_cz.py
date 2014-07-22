@@ -41,7 +41,10 @@ def _get_last_td(el):
     if not el:
         return None
 
-    last = el[0].find("td")
+    if type(el) in [list, tuple, set]:
+        el = el[0]
+
+    last = el.find("td")
 
     if not last:
         return None
@@ -51,14 +54,15 @@ def _get_last_td(el):
 
 def _get_td_or_none(details, ID):
     """
-    Get <tr> tag with given `ID` and return last <td> tag from it's content.
+    Get <tr> tag with given `ID` and return content of the last <td> tag from
+    <tr> root.
 
     Args:
         details (obj): :class:`dhtmlparser.HTMLElement` instance.
         ID (str): id property of the <tr> tag.
 
     Returns:
-        obj: HTMLElement contaning pointer to last <td> tag or None.
+        str: Content of the last <td> as strign.
     """
     content = details.find("tr", {"id": ID})
     content = _get_last_td(content)
@@ -259,7 +263,7 @@ def _process_book(book_url):
     return pub
 
 
-def parse_publications():
+def parse_publications():  # TODO: skip not yet published
     data = DOWNER.download(URL)
     dom = dhtmlparser.parseString(data)
 
@@ -297,4 +301,4 @@ def self_test():
 
     return True
 
-print self_test()
+# print self_test()
