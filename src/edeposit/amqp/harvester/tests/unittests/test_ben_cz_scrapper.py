@@ -4,6 +4,7 @@
 # Interpreter version: python 2.7
 #
 # Imports =====================================================================
+import pytest
 import dhtmlparser as d
 
 from harvester.scrappers import ben_cz
@@ -31,6 +32,8 @@ def test_get_last_td():
     assert result
     assert result.getContent() == "last"
 
+
+def test_get_last_td_tag_not_found():
     # test behavior when tag is not found
     test_str = """
     <tr>first</tr>
@@ -69,6 +72,8 @@ def test_get_td_or_none():
 
     assert result == "last"
 
+
+def test_get_td_or_none_tag_not_found():
     # test behavior when tag is not found
     test_str = """
     <tr>
@@ -192,3 +197,142 @@ def test_process_book():
     assert pub.optionals.edition == "1. české"
     assert pub.optionals.description == "Some description."
 
+
+def test_parse_title():
+    html = """
+    <head>
+        <title>Ignored title</title>
+    </head>
+    <body>
+        <h1>Title</h1>
+        <h1>Another title</h1>
+    </body>
+    """
+
+    dom = d.parseString(html)
+    result = ben_cz._parse_title(
+        dom,
+        dom.find("body")[0]
+    )
+
+    assert result
+    assert result == "Title"
+
+
+def test_parse_title_h1_not_found():
+    # when the <h1> is not found
+    html = """
+    <head>
+        <title>Ignored title</title>
+    </head>
+    <body>
+        <h2>Title</h2>
+        <h2>Another title</h2>
+    </body>
+    """
+
+    dom = d.parseString(html)
+    result = ben_cz._parse_title(
+        dom,
+        dom.find("body")[0]
+    )
+
+    assert result
+    assert result == "Ignored title"
+
+
+def test_parse_title_not_found():
+    # if no title is found, raise exception
+    html = """
+    <head>
+    </head>
+    <body>
+    </body>
+    """
+
+    dom = d.parseString(html)
+    with pytest.raises(AssertionError):
+        result = ben_cz._parse_title(
+            dom,
+            dom.find("body")[0]
+        )
+
+
+def test_parse_authors_multiple():
+    html = """
+    <tr id="ctl00_ContentPlaceHolder1_tblRowAutor">
+        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell2">autor</th>
+        <td id="ctl00_ContentPlaceHolder1_TableCell2">
+            <a href="first_url" title="Všechny knihy od First Author">First Author</a>,
+            <a href="second_url" title="Všechny knihy od Second Author">Second Author</a>
+        </td>
+    </tr>
+    """
+
+    result = ben_cz._parse_authors(d.parseString(html))
+
+    assert result
+    assert len(result) == 2
+    assert result[0].name == "First Author"
+    assert result[0].URL == "first_url"
+    assert result[1].name == "Second Author"
+    assert result[1].URL == "second_url"
+
+
+def test_parse_authors_one():
+    # only one author
+    html = """
+    <tr id="ctl00_ContentPlaceHolder1_tblRowAutor">
+        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell2">autor</th>
+        <td id="ctl00_ContentPlaceHolder1_TableCell2">
+            <a href="one_url" title="Všechny knihy od One Author">One Author</a>
+        </td>
+    </tr>
+    """
+
+    result = ben_cz._parse_authors(d.parseString(html))
+
+    assert result
+    assert len(result) == 1
+    assert result[0].name == "One Author"
+    assert result[0].URL == "one_url"
+
+def test_parse_authors_no_author():
+    # no author specified
+    html = """
+    <tr id="ctl00_ContentPlaceHolder1_tblRowAutor">
+        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell2">autor</th>
+        <td id="ctl00_ContentPlaceHolder1_TableCell2">
+            No author specified!
+        </td>
+    </tr>
+    """
+
+    result = ben_cz._parse_authors(d.parseString(html))
+
+    assert result == []
+    assert len(result) == 0
+
+
+def test_parse_authors_missing_block():
+    # author block is missing
+    html = """
+    <tr id="ctl00_ContentPlaceHolder1_tblRowAutor">
+        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell2">autor</th>
+    </tr>
+    """
+
+    result = ben_cz._parse_authors(d.parseString(html))
+
+    assert result == []
+    assert len(result) == 0
+
+
+def test_parse_authors_no_html():
+    # no html found
+    html = ""
+
+    result = ben_cz._parse_authors(d.parseString(html))
+
+    assert result == []
+    assert len(result) == 0
