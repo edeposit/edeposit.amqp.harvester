@@ -95,6 +95,535 @@ def test_get_td_or_none_tag_not_found():
     assert result is None
 
 
+def test_parse_title():
+    html = """
+    <head>
+        <title>Ignored title</title>
+    </head>
+    <body>
+        <h1>Title</h1>
+        <h1>Another title</h1>
+    </body>
+    """
+
+    dom = d.parseString(html)
+    result = ben_cz._parse_title(
+        dom,
+        dom.find("body")[0]
+    )
+
+    assert result
+    assert result == "Title"
+
+
+def test_parse_title_h1_not_found():
+    # when the <h1> is not found
+    html = """
+    <head>
+        <title>Ignored title</title>
+    </head>
+    <body>
+        <h2>Title</h2>
+        <h2>Another title</h2>
+    </body>
+    """
+
+    dom = d.parseString(html)
+    result = ben_cz._parse_title(
+        dom,
+        dom.find("body")[0]
+    )
+
+    assert result
+    assert result == "Ignored title"
+
+
+def test_parse_title_not_found():
+    # if no title is found, raise exception
+    html = """
+    <head>
+    </head>
+    <body>
+    </body>
+    """
+
+    dom = d.parseString(html)
+    with pytest.raises(AssertionError):
+        result = ben_cz._parse_title(
+            dom,
+            dom.find("body")[0]
+        )
+
+
+def test_parse_authors_multiple():
+    html = """
+    <tr id="ctl00_ContentPlaceHolder1_tblRowAutor">
+        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell2">autor</th>
+        <td id="ctl00_ContentPlaceHolder1_TableCell2">
+            <a href="first_url" title="Všechny knihy od First Author">First Author</a>,
+            <a href="second_url" title="Všechny knihy od Second Author">Second Author</a>
+        </td>
+    </tr>
+    """
+
+    result = ben_cz._parse_authors(d.parseString(html))
+
+    assert result
+    assert len(result) == 2
+    assert result[0].name == "First Author"
+    assert result[0].URL == "first_url"
+    assert result[1].name == "Second Author"
+    assert result[1].URL == "second_url"
+
+
+def test_parse_authors_one():
+    # only one author
+    html = """
+    <tr id="ctl00_ContentPlaceHolder1_tblRowAutor">
+        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell2">autor</th>
+        <td id="ctl00_ContentPlaceHolder1_TableCell2">
+            <a href="one_url" title="Všechny knihy od One Author">One Author</a>
+        </td>
+    </tr>
+    """
+
+    result = ben_cz._parse_authors(d.parseString(html))
+
+    assert result
+    assert len(result) == 1
+    assert result[0].name == "One Author"
+    assert result[0].URL == "one_url"
+
+
+def test_parse_authors_no_author():
+    # no author specified
+    html = """
+    <tr id="ctl00_ContentPlaceHolder1_tblRowAutor">
+        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell2">autor</th>
+        <td id="ctl00_ContentPlaceHolder1_TableCell2">
+            No author specified!
+        </td>
+    </tr>
+    """
+
+    result = ben_cz._parse_authors(d.parseString(html))
+
+    assert result == []
+    assert len(result) == 0
+
+
+def test_parse_authors_missing_block():
+    # author block is missing
+    html = """
+    <tr id="ctl00_ContentPlaceHolder1_tblRowAutor">
+        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell2">autor</th>
+    </tr>
+    """
+
+    result = ben_cz._parse_authors(d.parseString(html))
+
+    assert result == []
+    assert len(result) == 0
+
+
+def test_parse_authors_no_html():
+    # no html found
+    html = ""
+
+    result = ben_cz._parse_authors(d.parseString(html))
+
+    assert result == []
+    assert len(result) == 0
+
+
+def test_parse_publisher():
+    html = """
+    <tr id="ctl00_ContentPlaceHolder1_tblRowNakladatel">
+        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell3">vydal / výrobce</th>
+        <td id="ctl00_ContentPlaceHolder1_TableCell3">
+            <a href="http://shop.ben.cz/Produkty.aspx?lang=cz&nak=BEN+-+technick%c3%a1+literatura" title="Všechny knihy nakladatelství BEN - technická literatura">BEN - technická literatura</a>
+        </td>
+    </tr>
+    """
+
+    result = ben_cz._parse_publisher(d.parseString(html))
+
+    assert result
+    assert result == "BEN - technická literatura"
+
+
+def test_parse_publisher_is_blank():
+    html = """
+    <tr id="ctl00_ContentPlaceHolder1_tblRowNakladatel">
+        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell3">vydal / výrobce</th>
+        <td id="ctl00_ContentPlaceHolder1_TableCell3">
+        </td>
+    </tr>
+    """
+
+    result = ben_cz._parse_publisher(d.parseString(html))
+
+    assert result is None
+
+
+def test_parse_publisher_not_found():
+    html = """
+    <tr id="ctl00_ContentPlaceHolder1_tblRowNakladatel">
+        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell3">vydal / výrobce</th>
+    </tr>
+    """
+
+    result = ben_cz._parse_publisher(d.parseString(html))
+
+    assert result is None
+
+
+def test_parse_publisher_no_html():
+    html = ""
+
+    result = ben_cz._parse_publisher(d.parseString(html))
+
+    assert result is None
+
+
+def test_parse_price():
+    html = """
+    <tr id="ctl00_ContentPlaceHolder1_tblRowBeznaCena">
+        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell10">
+            <span title="Cena, za kterou se zboží prodává v kamenných obchodech.">
+                běžná cena
+            </span>
+        </th>
+        <td id="ctl00_ContentPlaceHolder1_TableCell10">100,00 Kč</td>
+    </tr>
+    """
+
+    result = ben_cz._parse_price(d.parseString(html))
+
+    assert result
+    assert result == "100,00 Kč"
+
+
+def test_parse_price_not_found():
+    html = """
+    <tr id="ctl00_ContentPlaceHolder1_tblRowBeznaCena">
+        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell10">
+            <span title="Cena, za kterou se zboží prodává v kamenných obchodech.">
+                běžná cena
+            </span>
+        </th>
+    </tr>
+    """
+
+    result = ben_cz._parse_price(d.parseString(html))
+
+    assert result is None
+
+
+def test_parse_price_no_html():
+    html = ""
+
+    result = ben_cz._parse_price(d.parseString(html))
+
+    assert result is None
+
+
+def test_parse_pages_binding():
+    html = """
+    <tr id="ctl00_ContentPlaceHolder1_tblRowRozsahVazba">
+        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell4">
+            rozsah / vazba
+        </th>
+        <td id="ctl00_ContentPlaceHolder1_TableCell4">1 strana / pevná</td>
+    </tr>
+    """
+
+    pages, binding = ben_cz._parse_pages_binding(d.parseString(html))
+
+    assert pages
+    assert binding
+
+    assert pages == "1 strana"
+    assert binding == "pevná"
+
+
+def test_parse_pages_binding_binding_not_found():
+    html = """
+    <tr id="ctl00_ContentPlaceHolder1_tblRowRozsahVazba">
+        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell4">
+            rozsah / vazba
+        </th>
+        <td id="ctl00_ContentPlaceHolder1_TableCell4">1 strana</td>
+    </tr>
+    """
+
+    pages, binding = ben_cz._parse_pages_binding(d.parseString(html))
+
+    assert pages
+    assert not binding
+
+    assert pages == "1 strana"
+    assert binding is None
+
+
+def test_parse_pages_binding_not_found():
+    html = """
+    <tr id="ctl00_ContentPlaceHolder1_tblRowRozsahVazba">
+        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell4">
+            rozsah / vazba
+        </th>
+        <td id="ctl00_ContentPlaceHolder1_TableCell4"></td>
+    </tr>
+    """
+
+    pages, binding = ben_cz._parse_pages_binding(d.parseString(html))
+
+    assert not pages
+    assert not binding
+
+    assert pages is None
+    assert binding is None
+
+
+def test_parse_pages_binding_tag_not_found():
+    html = """
+    <tr id="ctl00_ContentPlaceHolder1_tblRowRozsahVazba">
+        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell4">
+            rozsah / vazba
+        </th>
+    </tr>
+    """
+
+    pages, binding = ben_cz._parse_pages_binding(d.parseString(html))
+
+    assert not pages
+    assert not binding
+
+    assert pages is None
+    assert binding is None
+
+
+def test_parse_pages_binding_tag_no_html():
+    html = """
+    <tr id="ctl00_ContentPlaceHolder1_tblRowRozsahVazba">
+        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell4">
+            rozsah / vazba
+        </th>
+    </tr>
+    """
+
+    pages, binding = ben_cz._parse_pages_binding(d.parseString(html))
+
+    assert not pages
+    assert not binding
+
+    assert pages is None
+    assert binding is None
+
+
+def test_parse_ISBN_EAN():
+    html = """
+    <tr id="ctl00_ContentPlaceHolder1_tblRowIsbnEan">
+        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell7">
+            ISBN / EAN
+        </th>
+        <td id="ctl00_ContentPlaceHolder1_TableCell7">
+            978-80-7310-514-6 / 9788073105146
+        </td>
+    </tr>
+    """
+
+    isbn, ean = ben_cz._parse_ISBN_EAN(d.parseString(html))
+
+    assert isbn
+    assert ean
+
+    assert isbn == "978-80-7310-514-6"
+    assert ean == "9788073105146"
+
+
+def test_parse_ISBN_EAN_no_ean():
+    html = """
+    <tr id="ctl00_ContentPlaceHolder1_tblRowIsbnEan">
+        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell7">
+            ISBN / EAN
+        </th>
+        <td id="ctl00_ContentPlaceHolder1_TableCell7">
+            978-80-7310-514-6
+        </td>
+    </tr>
+    """
+
+    isbn, ean = ben_cz._parse_ISBN_EAN(d.parseString(html))
+
+    assert isbn
+    assert not ean
+
+    assert isbn == "978-80-7310-514-6"
+    assert ean is None
+
+
+def test_parse_ISBN_EAN_not_found():
+    html = """
+    <tr id="ctl00_ContentPlaceHolder1_tblRowIsbnEan">
+        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell7">
+            ISBN / EAN
+        </th>
+        <td id="ctl00_ContentPlaceHolder1_TableCell7"></td>
+    </tr>
+    """
+
+    isbn, ean = ben_cz._parse_ISBN_EAN(d.parseString(html))
+
+    assert not isbn
+    assert not ean
+
+    assert isbn is None
+    assert ean is None
+
+
+def test_parse_ISBN_EAN_no_tag():
+    html = """
+    <tr id="ctl00_ContentPlaceHolder1_tblRowIsbnEan">
+        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell7">
+            ISBN / EAN
+        </th>
+    </tr>
+    """
+
+    isbn, ean = ben_cz._parse_ISBN_EAN(d.parseString(html))
+
+    assert not isbn
+    assert not ean
+
+    assert isbn is None
+    assert ean is None
+
+
+def test_parse_ISBN_EAN_no_html():
+    html = ""
+
+    isbn, ean = ben_cz._parse_ISBN_EAN(d.parseString(html))
+
+    assert not isbn
+    assert not ean
+
+    assert isbn is None
+    assert ean is None
+
+
+def test_parse_edition():
+    html = """
+    <tr id="ctl00_ContentPlaceHolder1_tblRowVydani">
+        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell5">
+            vydání
+        </th>
+        <td id="ctl00_ContentPlaceHolder1_TableCell5">1. české</td>
+    </tr>
+    """
+
+    result = ben_cz._parse_edition(d.parseString(html))
+
+    assert result
+    assert result == "1. české"
+
+
+def test_parse_edition_missing():
+    html = """
+    <tr id="ctl00_ContentPlaceHolder1_tblRowVydani">
+        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell5">
+            vydání
+        </th>
+        <td id="ctl00_ContentPlaceHolder1_TableCell5"></td>
+    </tr>
+    """
+
+    result = ben_cz._parse_edition(d.parseString(html))
+
+    assert result is None
+
+
+def test_parse_edition_no_tag():
+    html = """
+    <tr id="ctl00_ContentPlaceHolder1_tblRowVydani">
+        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell5">
+            vydání
+        </th>
+    </tr>
+    """
+
+    result = ben_cz._parse_edition(d.parseString(html))
+
+    assert result is None
+
+
+def test_parse_edition_no_html():
+    html = ""
+
+    result = ben_cz._parse_edition(d.parseString(html))
+
+    assert result is None
+
+
+def test_parse_description():
+    html = """
+    <div class="detailKat">This shouldn't be here.</div>
+    <h3>Popis</h3>
+    <div class="detailPopis">
+        Some <without tags=True />description.
+        <p class="detailKat">This shouldn't be here.</p>
+    </div>
+    """
+
+    result = ben_cz._parse_description(d.parseString(html))
+
+    assert result
+    assert result == "Some description."
+
+
+def test_parse_description_no_other_tags():
+    html = """
+    <div class="detailPopis">
+        Some <without tags=True />description.
+    </div>
+    """
+
+    result = ben_cz._parse_description(d.parseString(html))
+
+    assert result
+    assert result == "Some description."
+
+
+def test_parse_description_missing():
+    html = """
+    <div class="detailPopis"></div>
+    """
+
+    result = ben_cz._parse_description(d.parseString(html))
+
+    assert result is None
+
+
+def test_parse_description_no_tag():
+    html = """
+    xe
+    <div>something</div>
+    something else
+    """
+
+    result = ben_cz._parse_description(d.parseString(html))
+
+    assert result is None
+
+
+def test_parse_description_no_html():
+    html = ""
+
+    result = ben_cz._parse_description(d.parseString(html))
+
+    assert result is None
+
+
 def test_process_book():
     test_data = """<div id="contentDetail">
    <h1 class="line-remove">
@@ -196,143 +725,3 @@ def test_process_book():
     assert pub.optionals.binding == "pevná"
     assert pub.optionals.edition == "1. české"
     assert pub.optionals.description == "Some description."
-
-
-def test_parse_title():
-    html = """
-    <head>
-        <title>Ignored title</title>
-    </head>
-    <body>
-        <h1>Title</h1>
-        <h1>Another title</h1>
-    </body>
-    """
-
-    dom = d.parseString(html)
-    result = ben_cz._parse_title(
-        dom,
-        dom.find("body")[0]
-    )
-
-    assert result
-    assert result == "Title"
-
-
-def test_parse_title_h1_not_found():
-    # when the <h1> is not found
-    html = """
-    <head>
-        <title>Ignored title</title>
-    </head>
-    <body>
-        <h2>Title</h2>
-        <h2>Another title</h2>
-    </body>
-    """
-
-    dom = d.parseString(html)
-    result = ben_cz._parse_title(
-        dom,
-        dom.find("body")[0]
-    )
-
-    assert result
-    assert result == "Ignored title"
-
-
-def test_parse_title_not_found():
-    # if no title is found, raise exception
-    html = """
-    <head>
-    </head>
-    <body>
-    </body>
-    """
-
-    dom = d.parseString(html)
-    with pytest.raises(AssertionError):
-        result = ben_cz._parse_title(
-            dom,
-            dom.find("body")[0]
-        )
-
-
-def test_parse_authors_multiple():
-    html = """
-    <tr id="ctl00_ContentPlaceHolder1_tblRowAutor">
-        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell2">autor</th>
-        <td id="ctl00_ContentPlaceHolder1_TableCell2">
-            <a href="first_url" title="Všechny knihy od First Author">First Author</a>,
-            <a href="second_url" title="Všechny knihy od Second Author">Second Author</a>
-        </td>
-    </tr>
-    """
-
-    result = ben_cz._parse_authors(d.parseString(html))
-
-    assert result
-    assert len(result) == 2
-    assert result[0].name == "First Author"
-    assert result[0].URL == "first_url"
-    assert result[1].name == "Second Author"
-    assert result[1].URL == "second_url"
-
-
-def test_parse_authors_one():
-    # only one author
-    html = """
-    <tr id="ctl00_ContentPlaceHolder1_tblRowAutor">
-        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell2">autor</th>
-        <td id="ctl00_ContentPlaceHolder1_TableCell2">
-            <a href="one_url" title="Všechny knihy od One Author">One Author</a>
-        </td>
-    </tr>
-    """
-
-    result = ben_cz._parse_authors(d.parseString(html))
-
-    assert result
-    assert len(result) == 1
-    assert result[0].name == "One Author"
-    assert result[0].URL == "one_url"
-
-def test_parse_authors_no_author():
-    # no author specified
-    html = """
-    <tr id="ctl00_ContentPlaceHolder1_tblRowAutor">
-        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell2">autor</th>
-        <td id="ctl00_ContentPlaceHolder1_TableCell2">
-            No author specified!
-        </td>
-    </tr>
-    """
-
-    result = ben_cz._parse_authors(d.parseString(html))
-
-    assert result == []
-    assert len(result) == 0
-
-
-def test_parse_authors_missing_block():
-    # author block is missing
-    html = """
-    <tr id="ctl00_ContentPlaceHolder1_tblRowAutor">
-        <th scope="row" id="ctl00_ContentPlaceHolder1_TableHeaderCell2">autor</th>
-    </tr>
-    """
-
-    result = ben_cz._parse_authors(d.parseString(html))
-
-    assert result == []
-    assert len(result) == 0
-
-
-def test_parse_authors_no_html():
-    # no html found
-    html = ""
-
-    result = ben_cz._parse_authors(d.parseString(html))
-
-    assert result == []
-    assert len(result) == 0
