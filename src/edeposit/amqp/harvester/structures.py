@@ -47,7 +47,7 @@ class Optionals(object):
                 "%s has no attribute %s!" % (self.__class__.__name__, key)
             )
 
-        if not key.startswith("_") and key is not None:
+        if not key.startswith("_") and val is not None:
             self.__dict__["_any_set"] = True
 
         self.__dict__[key] = val
