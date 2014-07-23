@@ -3,14 +3,17 @@
 #
 # Interpreter version: python 2.7
 #
+"""
+ben.cz scrapper.
+
+This module downloads last 100 books published by ben.cz.
+"""
 # Imports =====================================================================
 import httpkie
 import dhtmlparser
 
-from structures import Author
-from structures import Publication
-# from ..structures import Author
-# from ..structures import Publication
+from ..structures import Author
+from ..structures import Publication
 
 
 # Variables ===================================================================
@@ -344,7 +347,13 @@ def _process_book(book_url):
     return pub
 
 
-def parse_publications():  # TODO: skip not yet published
+def get_publications():
+    """
+    Get list of publication offered by ben.cz.
+
+    Returns:
+        list: List of :class:`structures.Publication` objects.
+    """
     data = DOWNER.download(URL)
     dom = dhtmlparser.parseString(data)
 
@@ -358,6 +367,9 @@ def parse_publications():  # TODO: skip not yet published
 
         assert a, "Can't find link to the details of the book!"
 
+        if a[0].find("span", {"class": "ruzek pripravujeme"}):
+            continue
+
         books.append(
             _process_book(a[0].params["href"])
         )
@@ -366,11 +378,20 @@ def parse_publications():  # TODO: skip not yet published
 
 
 def self_test():
-    books = parse_publications()
+    """
+    Perform basic selftest.
+
+    Returns:
+        True: When everything is ok.
+
+    Raises:
+        AssertionError: When there is some problem.
+    """
+    books = get_publications()
 
     assert len(books) > 0
 
-    for book in parse_publications():
+    for book in books:
         error = "Book doesn't have all required parameters!\n"
         error += str(book.to_namedtuple())
 
