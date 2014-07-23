@@ -115,16 +115,16 @@ def _parse_authors(details):
 
 
 def _parse_publisher(details):
-    publisher = details.find(
-        "td",
-        {"id": "ctl00_ContentPlaceHolder1_TableCell3"}
+    publisher = _get_td_or_none(
+        details,
+        "ctl00_ContentPlaceHolder1_tblRowNakladatel"
     )
 
     # publisher is not specified
     if not publisher:
         return None
 
-    publisher = dhtmlparser.removeTags(publisher[0]).strip()
+    publisher = dhtmlparser.removeTags(publisher).strip()
 
     # return None instead of blank string
     if not publisher:
