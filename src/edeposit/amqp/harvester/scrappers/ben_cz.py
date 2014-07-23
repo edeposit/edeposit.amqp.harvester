@@ -80,6 +80,19 @@ def _get_td_or_none(details, ID):
 
 # Parsers =====================================================================
 def _parse_title(dom, details):
+    """
+    Parse title/name of the book.
+
+    Args:
+        dom (obj): HTMLElement containing whole HTML page.
+        details (obj): HTMLElement containing slice of the page with details.
+
+    Returns:
+        str: Book's title.
+
+    Raises:
+        AssertionError: If title not found.
+    """
     title = details.find("h1")
 
     # if the header is missing, try to parse title from the <title> tag
@@ -93,6 +106,16 @@ def _parse_title(dom, details):
 
 
 def _parse_authors(details):
+    """
+    Parse authors of the book.
+
+    Args:
+        details (obj): HTMLElement containing slice of the page with details.
+
+    Returns:
+        list: List of :class:`structures.Author` objects. Blank if no author \
+              found.
+    """
     authors = details.find(
         "tr",
         {"id": "ctl00_ContentPlaceHolder1_tblRowAutor"}
@@ -115,6 +138,15 @@ def _parse_authors(details):
 
 
 def _parse_publisher(details):
+    """
+    Parse publisher of the book.
+
+    Args:
+        details (obj): HTMLElement containing slice of the page with details.
+
+    Returns:
+        str/None: Publisher's name as string or None if not found.
+    """
     publisher = _get_td_or_none(
         details,
         "ctl00_ContentPlaceHolder1_tblRowNakladatel"
@@ -134,6 +166,15 @@ def _parse_publisher(details):
 
 
 def _parse_price(details):
+    """
+    Parse price of the book.
+
+    Args:
+        details (obj): HTMLElement containing slice of the page with details.
+
+    Returns:
+        str/None: Price as string with currency or None if not found.
+    """
     price = _get_td_or_none(
         details,
         "ctl00_ContentPlaceHolder1_tblRowBeznaCena"
@@ -143,6 +184,15 @@ def _parse_price(details):
 
 
 def _parse_pages_binding(details):
+    """
+    Parse number of pages and binding of the book.
+
+    Args:
+        details (obj): HTMLElement containing slice of the page with details.
+
+    Returns:
+        (pages, binding): Tuple with two string or two None.
+    """
     pages = _get_td_or_none(
         details,
         "ctl00_ContentPlaceHolder1_tblRowRozsahVazba"
@@ -163,6 +213,15 @@ def _parse_pages_binding(details):
 
 
 def _parse_ISBN_EAN(details):
+    """
+    Parse ISBN and EAN.
+
+    Args:
+        details (obj): HTMLElement containing slice of the page with details.
+
+    Returns:
+        (ISBN, EAN): Tuple with two string or two None.
+    """
     isbn_ean = _get_td_or_none(
         details,
         "ctl00_ContentPlaceHolder1_tblRowIsbnEan"
@@ -187,6 +246,15 @@ def _parse_ISBN_EAN(details):
 
 
 def _parse_edition(details):
+    """
+    Parse edition (vydání) of the book.
+
+    Args:
+        details (obj): HTMLElement containing slice of the page with details.
+
+    Returns:
+        str/None: Edition as string with currency or None if not found.
+    """
     edition = _get_td_or_none(
         details,
         "ctl00_ContentPlaceHolder1_tblRowVydani"
@@ -196,6 +264,15 @@ def _parse_edition(details):
 
 
 def _parse_description(details):
+    """
+    Parse description of the book.
+
+    Args:
+        details (obj): HTMLElement containing slice of the page with details.
+
+    Returns:
+        str/None: Details as string with currency or None if not found.
+    """
     description = details.find("div", {"class": "detailPopis"})
 
     # description not found
