@@ -15,7 +15,8 @@ from structures import Publication
 
 
 # Variables ===================================================================
-URL = "http://www.grada.cz/novinky/?start=0&krok=100"
+BASE_URL = "http://www.grada.cz"
+URL = BASE_URL + "/novinky/?start=0&krok=100"
 DOWNER = httpkie.Downloader()
 
 
@@ -44,6 +45,58 @@ def _handle_encodnig(html):
     return html.decode(encoding).encode("utf-8")
 
 
+def _normalize_url(url):
+    if not url:
+        return None
+
+    if "http://" not in url:
+        url = BASE_URL + url.replace("../", "/")
+
+    return url
+
+
+def _parse_alt_title(html_chunk):
+    title = html_chunk.find(
+        "input",
+        {"src": "../images_buttons/objednat_off.gif"}
+    )
+
+    assert title, "Can't find alternative title!"
+    assert "title" in title.params, "Can't find alternative title source!"
+
+    return title.params["title"].split(":", 1)[-1]
+
+
+def _parse_title_url(html_chunk):
+    title = html_chunk.find("div", {"class": "comment"})
+
+    if not title:
+        return _parse_alt_title(html_chunk)
+
+    title = title[0].find("h2")
+    if not title:
+        return _parse_alt_title(html_chunk)
+
+    url = None
+    url_tag = title[0].find("a")
+
+    if url_tag:
+        url = url_tag[0].params.get("href", None)
+        title = url_tag
+
+    return title[0].getContent(), _normalize_url(url)
+
+
+def _process_book(html_chunk):
+    # title, url = _parse_title_url(html_chunk)
+    # authors = _parse_authors(html_chunk)
+    # publisher = _parse_publisher(html_chunk)
+    # price = _parse_price(html_chunk)
+    # pages = _parse_pages(html_chunk)
+
+    print _parse_title_url(html_chunk)
+
+
 def get_publications():
     """
     Get list of publication offered by ben.cz.
@@ -60,8 +113,11 @@ def get_publications():
 
     books = []
     for book in book_list:
-        print book
-        print "--"
+        books.append(
+            _process_book(book)
+        )
+
+    return books
 
 
 def self_test():
