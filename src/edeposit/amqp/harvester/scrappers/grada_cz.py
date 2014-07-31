@@ -56,6 +56,18 @@ def _normalize_url(url):
 
 
 def _first_content(el_list, alt=None):
+    """
+    Return content of the first element in `el_list` or `alt`. Also return `alt`
+    if the content string of first element is blank.
+
+    Args:
+        el_list (list): List of HTMLElement objects.
+        alt (default None): Value returner when list or content is blank.
+
+    Returns:
+        str or alt: String representation of the content of the first element \
+                    or `alt` if not found.
+    """
     if not el_list:
         return alt
 
