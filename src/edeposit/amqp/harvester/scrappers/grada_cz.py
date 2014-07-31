@@ -55,6 +55,18 @@ def _normalize_url(url):
     return url
 
 
+def _first_content(el_list, alt=None):
+    if not el_list:
+        return alt
+
+    content = el_list[0].getContent()
+
+    if not content:
+        return alt
+
+    return content
+
+
 def _parse_alt_title(html_chunk):
     title = html_chunk.find(
         "input",
@@ -77,14 +89,34 @@ def _parse_title_url(html_chunk):
     if not title:
         return _parse_alt_title(html_chunk)
 
+    # look for the url of the book if present
     url = None
     url_tag = title[0].find("a")
-
     if url_tag:
         url = url_tag[0].params.get("href", None)
         title = url_tag
 
     return title[0].getContent(), _normalize_url(url)
+
+
+def _parse_subtitle(html_chunk):
+    subtitle = html_chunk.find("div", {"class": "comment"})
+    if not subtitle:
+        return None
+
+    subtitle = subtitle[0].find("h2")
+    if not subtitle:
+        return None
+
+    subtitle = subtitle[0].find("span", {"class": "gray"})
+    if not subtitle:
+        return None
+
+    subtitle = subtitle[0].getContent()
+    if not subtitle:
+        return None
+
+    return subtitle
 
 
 def _process_book(html_chunk):
@@ -95,6 +127,8 @@ def _process_book(html_chunk):
     # pages = _parse_pages(html_chunk)
 
     print _parse_title_url(html_chunk)
+    print _parse_subtitle(html_chunk)
+    print "---"
 
 
 def get_publications():
