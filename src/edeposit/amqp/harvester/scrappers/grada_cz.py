@@ -100,23 +100,13 @@ def _parse_title_url(html_chunk):
 
 
 def _parse_subtitle(html_chunk):
-    subtitle = html_chunk.find("div", {"class": "comment"})
-    if not subtitle:
-        return None
+    subtitle = html_chunk.match(
+        ["div", {"class": "comment"}],
+        "h2",
+        ["span", {"class": "gray"}],
+    )
 
-    subtitle = subtitle[0].find("h2")
-    if not subtitle:
-        return None
-
-    subtitle = subtitle[0].find("span", {"class": "gray"})
-    if not subtitle:
-        return None
-
-    subtitle = subtitle[0].getContent()
-    if not subtitle:
-        return None
-
-    return subtitle
+    return _first_content(subtitle)
 
 
 def _process_book(html_chunk):
@@ -126,8 +116,12 @@ def _process_book(html_chunk):
     # price = _parse_price(html_chunk)
     # pages = _parse_pages(html_chunk)
 
-    print _parse_title_url(html_chunk)
-    print _parse_subtitle(html_chunk)
+    title, url = _parse_title_url(html_chunk)
+    subtitle = _parse_subtitle(html_chunk)
+
+    print title
+    print url
+    print subtitle
     print "---"
 
 
