@@ -147,6 +147,15 @@ def _parse_authors(html_chunk):
 
 
 def _parse_description(html_chunk):
+    """
+    Parse description of the book.
+
+    Args:
+        details (obj): HTMLElement containing slice of the page with details.
+
+    Returns:
+        str/None: Details as string with currency or None if not found.
+    """
     perex = html_chunk.find("div", {"class": "perex"})
 
     return _first_content(perex)
@@ -181,9 +190,21 @@ def _parse_format_pages_isbn(html_chunk):
 
 
 def _parse_price(html_chunk):
+    """
+    Parse price of the book.
+
+    Args:
+        details (obj): HTMLElement containing slice of the page with details.
+
+    Returns:
+        str/None: Price as string with currency or None if not found.
+    """
     price = _first_content(
         html_chunk.find("div", {"class": "prices"})
     )
+
+    if not price:
+        return None
 
     # it is always in format Cena:\n150kč
     price = dhtmlparser.removeTags(price)
@@ -193,6 +214,15 @@ def _parse_price(html_chunk):
 
 
 def _process_book(html_chunk):
+    """
+    Parse available informations about book from the book details page.
+
+    Args:
+        book_url (str): Absolute URL of the book.
+
+    Returns:
+        obj: :class:`structures.Publication` instance with book details.
+    """
     title, url = _parse_title_url(html_chunk)
     format, pages, isbn = _parse_format_pages_isbn(html_chunk)
 
