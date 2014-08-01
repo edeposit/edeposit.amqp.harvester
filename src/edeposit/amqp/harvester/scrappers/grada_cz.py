@@ -136,7 +136,7 @@ def _parse_authors(html_chunk):
         return []
 
     authors = map(
-        lambda x: Author(
+        lambda x: Author(                            # create Author objects
             x.getContent().strip(),
             _normalize_url(x.params.get("href", None))
         ),
@@ -152,6 +152,34 @@ def _parse_description(html_chunk):
     return _first_content(perex)
 
 
+def _parse_format_pages_isbn(html_chunk):
+    ppi = _first_content(
+        html_chunk.find("div", {"class": "price-overflow"})
+    )
+
+    if not ppi:
+        return None, None, None
+
+    # all information this function should parse are at one line
+    ppi = filter(lambda x: x.strip(), ppi.split("<br />"))[0]
+
+    # parse isbn
+    isbn = dhtmlparser.parseString(ppi)
+    isbn = isbn.find("b")
+    isbn = isbn[0].getContent() if isbn else None
+
+    # parse pages and format
+    pages = None
+    format = None
+    details = ppi.split("|")
+
+    if len(details) >= 2:
+        format = details[0].strip()
+        pages = details[1].strip()
+
+    return format, pages, isbn
+
+
 def _process_book(html_chunk):
     # title, url = _parse_title_url(html_chunk)
     # authors = _parse_authors(html_chunk)
@@ -160,15 +188,20 @@ def _process_book(html_chunk):
     # pages = _parse_pages(html_chunk)
 
     title, url = _parse_title_url(html_chunk)
-    subtitle = _parse_subtitle(html_chunk)
     authors = _parse_authors(html_chunk)
+    subtitle = _parse_subtitle(html_chunk)
     description = _parse_description(html_chunk)
+    publisher = "Grada"
+    format, pages, isbn = _parse_format_pages_isbn(html_chunk)
 
     print title
     print url
     print subtitle
     print description
     print map(lambda x: x.to_namedtuple(), authors)
+    print publisher
+    print format, pages, isbn
+    print
     print "---"
 
 
