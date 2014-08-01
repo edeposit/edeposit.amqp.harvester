@@ -121,6 +121,25 @@ def _parse_subtitle(html_chunk):
     return _first_content(subtitle)
 
 
+def _parse_authors(html_chunk):
+    authors = html_chunk.match(
+        ["div", {"class": "comment"}],
+        "h3",
+        "a",
+    )
+
+    if not authors:
+        return []
+
+    return map(
+        lambda x: Author(
+            x.getContent().strip(),
+            _normalize_url(x.params.get("href", None))
+        ),
+        authors
+    )
+
+
 def _process_book(html_chunk):
     # title, url = _parse_title_url(html_chunk)
     # authors = _parse_authors(html_chunk)
@@ -130,10 +149,12 @@ def _process_book(html_chunk):
 
     title, url = _parse_title_url(html_chunk)
     subtitle = _parse_subtitle(html_chunk)
+    authors = _parse_authors(html_chunk)
 
     print title
     print url
     print subtitle
+    print map(lambda x: x.to_namedtuple(), authors)
     print "---"
 
 
