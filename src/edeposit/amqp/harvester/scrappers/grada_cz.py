@@ -55,7 +55,7 @@ def _normalize_url(url):
     return url
 
 
-def _first_content(el_list, alt=None):
+def _first_content(el_list, alt=None, strip=True):
     """
     Return content of the first element in `el_list` or `alt`. Also return `alt`
     if the content string of first element is blank.
@@ -63,6 +63,7 @@ def _first_content(el_list, alt=None):
     Args:
         el_list (list): List of HTMLElement objects.
         alt (default None): Value returner when list or content is blank.
+        strip (bool, default True): Call .strip() to content.
 
     Returns:
         str or alt: String representation of the content of the first element \
@@ -72,6 +73,9 @@ def _first_content(el_list, alt=None):
         return alt
 
     content = el_list[0].getContent()
+
+    if strip:
+        content = content.strip()
 
     if not content:
         return alt
@@ -140,6 +144,12 @@ def _parse_authors(html_chunk):
     )
 
 
+def _parse_description(html_chunk):
+    perex = html_chunk.find("div", {"class": "perex"})
+
+    return _first_content(perex)
+
+
 def _process_book(html_chunk):
     # title, url = _parse_title_url(html_chunk)
     # authors = _parse_authors(html_chunk)
@@ -150,10 +160,12 @@ def _process_book(html_chunk):
     title, url = _parse_title_url(html_chunk)
     subtitle = _parse_subtitle(html_chunk)
     authors = _parse_authors(html_chunk)
+    description = _parse_description(html_chunk)
 
     print title
     print url
     print subtitle
+    print description
     print map(lambda x: x.to_namedtuple(), authors)
     print "---"
 
