@@ -135,13 +135,15 @@ def _parse_authors(html_chunk):
     if not authors:
         return []
 
-    return map(
+    authors = map(
         lambda x: Author(
             x.getContent().strip(),
             _normalize_url(x.params.get("href", None))
         ),
         authors
     )
+
+    return filter(lambda x: x.name.strip(), authors)
 
 
 def _parse_description(html_chunk):
