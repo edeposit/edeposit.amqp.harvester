@@ -193,28 +193,26 @@ def _parse_price(html_chunk):
 
 
 def _process_book(html_chunk):
-    # title, url = _parse_title_url(html_chunk)
-    # authors = _parse_authors(html_chunk)
-    # publisher = _parse_publisher(html_chunk)
-    # price = _parse_price(html_chunk)
-    # pages = _parse_pages(html_chunk)
-
     title, url = _parse_title_url(html_chunk)
-    authors = _parse_authors(html_chunk)
-    subtitle = _parse_subtitle(html_chunk)
-    description = _parse_description(html_chunk)
-    publisher = "Grada"
     format, pages, isbn = _parse_format_pages_isbn(html_chunk)
 
-    print title
-    print url
-    print subtitle
-    print description
-    print map(lambda x: x.to_namedtuple(), authors)
-    print publisher
-    print format, pages, isbn
-    print _parse_price(html_chunk)
-    print "---"
+    # required informations
+    pub = Publication(
+        title=title,
+        authors=_parse_authors(html_chunk),
+        pages=pages,
+        price=_parse_price(html_chunk),
+        publisher="Grada"
+    )
+
+    # optional informations
+    pub.optionals.url = url
+    pub.optionals.isbn = isbn
+    pub.optionals.format = format
+    pub.optionals.sub_title = _parse_subtitle(html_chunk)
+    pub.optionals.description = _parse_description(html_chunk)
+
+    return pub
 
 
 def get_publications():
