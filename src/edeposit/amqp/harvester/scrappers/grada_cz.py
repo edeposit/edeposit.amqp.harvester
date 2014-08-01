@@ -180,6 +180,18 @@ def _parse_format_pages_isbn(html_chunk):
     return format, pages, isbn
 
 
+def _parse_price(html_chunk):
+    price = _first_content(
+        html_chunk.find("div", {"class": "prices"})
+    )
+
+    # it is always in format Cena:\n150kč
+    price = dhtmlparser.removeTags(price)
+    price = price.split("\n")[-1]
+
+    return price
+
+
 def _process_book(html_chunk):
     # title, url = _parse_title_url(html_chunk)
     # authors = _parse_authors(html_chunk)
@@ -201,7 +213,7 @@ def _process_book(html_chunk):
     print map(lambda x: x.to_namedtuple(), authors)
     print publisher
     print format, pages, isbn
-    print
+    print _parse_price(html_chunk)
     print "---"
 
 
