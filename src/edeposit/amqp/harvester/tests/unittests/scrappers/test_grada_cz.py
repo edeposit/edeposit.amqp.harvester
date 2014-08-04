@@ -28,7 +28,7 @@ HTML = """
 <b class="red">199</b> Kč </div>
 </div>
 <div class="comment">
-<h2><a href="../url_to_the_catalog-6656489/kniha/katalog/" class="h1" title="Detail knihy: Main title">Main title</a><br /><span class="gray"></span></h2>
+<h2><a href="../url_to_the_catalog-6656489/kniha/katalog/" class="h1" title="Detail knihy: Main title">Main title</a><br /><span class="gray">Subtitle</span></h2>
 $AUTHOR
 <div class="perex">
 
@@ -58,6 +58,7 @@ ks &nbsp; <input src="../images_buttons/objednat_off.gif" type="image" title="Ob
 </div>
 </div>
 """
+dom = dhtmlparser.parseString(HTML)
 
 
 # Functions & objects =========================================================
@@ -67,8 +68,6 @@ def test_normalize_url():
 
 
 def test_parse_alt_title():
-    dom = dhtmlparser.parseString(HTML)
-
     title = grada._parse_alt_title(dom)
 
     assert title == "Alt Main title"
@@ -92,7 +91,17 @@ def test_parse_title_url():
 
 
 def test_parse_subtitle():
-    pass
+    dom = dhtmlparser.parseString(HTML)
+
+    subtitle = grada._parse_subtitle(dom)
+    assert subtitle == "Subtitle"
+
+    # DOM without subtitle
+    st = dom.find("span", {"class": "gray"})[0]
+    st.replaceWith(dhtmlparser.HTMLElement())
+
+    subtitle = grada._parse_subtitle(dom)
+    assert subtitle is None
 
 
 def test_parse_authors():
