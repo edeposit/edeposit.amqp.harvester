@@ -10,6 +10,8 @@ import dhtmlparser
 from structures import Author
 from structures import Publication
 
+from utils import handle_encodnig, get_first_content
+
 # from ..structures import Author
 # from ..structures import Publication
 
@@ -21,31 +23,16 @@ DOWNER = httpkie.Downloader()
 
 
 # Functions & objects =========================================================
-def _get_encoding(dom, default="utf-8"):
-    encoding = dom.find("meta", {"http-equiv": "Content-Type"})
-
-    if not encoding:
-        return default
-
-    if "content" not in encoding[0].params:
-        return default
-
-    encoding = encoding[0].params["content"]
-
-    return encoding.lower().split("=")[-1]
-
-
-def _handle_encodnig(html):
-    encoding = _get_encoding(
-        dhtmlparser.parseString(
-            html.split("</head>")[0]
-        )
-    )
-
-    return html.decode(encoding).encode("utf-8")
-
-
 def _normalize_url(url):
+    """
+    Normalize the `url` - from relative, create absolute URL.
+
+    Args:
+        url (str): Relative url.
+
+    Returns:
+        str/None: Normalized URL or None if `url` is blank.
+    """
     if not url:
         return None
 
@@ -55,35 +42,16 @@ def _normalize_url(url):
     return url
 
 
-def _first_content(el_list, alt=None, strip=True):
+def _parse_alt_title(html_chunk):
     """
-    Return content of the first element in `el_list` or `alt`. Also return `alt`
-    if the content string of first element is blank.
+    Parse title from alternative location if not found where it should be.
 
     Args:
-        el_list (list): List of HTMLElement objects.
-        alt (default None): Value returner when list or content is blank.
-        strip (bool, default True): Call .strip() to content.
+        details (obj): HTMLElement containing slice of the page with deta
 
     Returns:
-        str or alt: String representation of the content of the first element \
-                    or `alt` if not found.
+        str: Book's title.
     """
-    if not el_list:
-        return alt
-
-    content = el_list[0].getContent()
-
-    if strip:
-        content = content.strip()
-
-    if not content:
-        return alt
-
-    return content
-
-
-def _parse_alt_title(html_chunk):
     title = html_chunk.find(
         "input",
         {"src": "../images_buttons/objednat_off.gif"}
@@ -96,6 +64,15 @@ def _parse_alt_title(html_chunk):
 
 
 def _parse_title_url(html_chunk):
+    """
+    Parse title/name of the book and URL of the book.
+
+    Args:
+        details (obj): HTMLElement containing slice of the page with details.
+
+    Returns:
+        str: Book's title.
+    """
     title = html_chunk.find("div", {"class": "comment"})
 
     if not title:
@@ -116,16 +93,35 @@ def _parse_title_url(html_chunk):
 
 
 def _parse_subtitle(html_chunk):
+    """
+    Parse subtitle of the book.
+
+    Args:
+        details (obj): HTMLElement containing slice of the page with details.
+
+    Returns:
+        str/None: Subtitle or None if subtitle wasn't found.
+    """
     subtitle = html_chunk.match(
         ["div", {"class": "comment"}],
         "h2",
         ["span", {"class": "gray"}],
     )
 
-    return _first_content(subtitle)
+    return get_first_content(subtitle)
 
 
 def _parse_authors(html_chunk):
+    """
+    Parse authors of the book.
+
+    Args:
+        details (obj): HTMLElement containing slice of the page with details.
+
+    Returns:
+        list: List of :class:`structures.Author` objects. Blank if no author \
+              found.
+    """
     authors = html_chunk.match(
         ["div", {"class": "comment"}],
         "h3",
@@ -151,18 +147,27 @@ def _parse_description(html_chunk):
     Parse description of the book.
 
     Args:
-        details (obj): HTMLElement containing slice of the page with details.
+        html_chunk (obj): HTMLElement containing slice of the page with details.
 
     Returns:
         str/None: Details as string with currency or None if not found.
     """
     perex = html_chunk.find("div", {"class": "perex"})
 
-    return _first_content(perex)
+    return get_first_content(perex)
 
 
 def _parse_format_pages_isbn(html_chunk):
-    ppi = _first_content(
+    """
+    Parse format, number of pages and ISBN.
+
+    Args:
+        html_chunk (obj): HTMLElement containing slice of the page with details.
+
+    Returns:
+        tuple: (format, pages, isbn), all as string.
+    """
+    ppi = get_first_content(
         html_chunk.find("div", {"class": "price-overflow"})
     )
 
@@ -179,14 +184,14 @@ def _parse_format_pages_isbn(html_chunk):
 
     # parse pages and format
     pages = None
-    format = None
+    book_format = None
     details = ppi.split("|")
 
     if len(details) >= 2:
-        format = details[0].strip()
+        book_format = details[0].strip()
         pages = details[1].strip()
 
-    return format, pages, isbn
+    return book_format, pages, isbn
 
 
 def _parse_price(html_chunk):
@@ -194,12 +199,12 @@ def _parse_price(html_chunk):
     Parse price of the book.
 
     Args:
-        details (obj): HTMLElement containing slice of the page with details.
+        html_chunk (obj): HTMLElement containing slice of the page with details.
 
     Returns:
         str/None: Price as string with currency or None if not found.
     """
-    price = _first_content(
+    price = get_first_content(
         html_chunk.find("div", {"class": "prices"})
     )
 
@@ -224,7 +229,7 @@ def _process_book(html_chunk):
         obj: :class:`structures.Publication` instance with book details.
     """
     title, url = _parse_title_url(html_chunk)
-    format, pages, isbn = _parse_format_pages_isbn(html_chunk)
+    book_format, pages, isbn = _parse_format_pages_isbn(html_chunk)
 
     # required informations
     pub = Publication(
@@ -237,8 +242,8 @@ def _process_book(html_chunk):
 
     # optional informations
     pub.optionals.url = url
-    pub.optionals.isbn = isbn
-    pub.optionals.format = format
+    pub.optionals.ISBN = isbn
+    pub.optionals.format = book_format
     pub.optionals.sub_title = _parse_subtitle(html_chunk)
     pub.optionals.description = _parse_description(html_chunk)
 
@@ -254,7 +259,7 @@ def get_publications():
     """
     data = DOWNER.download(URL)
     dom = dhtmlparser.parseString(
-        _handle_encodnig(data)
+        handle_encodnig(data)
     )
 
     book_list = dom.find("div", {"class": "item"})
@@ -281,4 +286,4 @@ def self_test():
     pass
 
 
-get_publications()
+print len(get_publications())
