@@ -104,8 +104,30 @@ def test_parse_subtitle():
     assert subtitle is None
 
 
-def test_parse_authors():
-    pass
+def test_parse_authors_no_author():
+    assert grada._parse_authors(dom) == []
+
+
+def test_parse_authors_one_author():
+    dom = dhtmlparser.parseString(HTML.replace("$AUTHOR", AUTHOR))
+
+    author = grada._parse_authors(dom)
+
+    assert len(author) == 1
+    assert author[0].name == "Putšálek Monika"
+    assert author[0].URL == grada.BASE_URL + "/dalsi-knihy-autora/Putsalek_Monika/"
+
+
+def test_parse_authors_multiple_authors():
+    dom = dhtmlparser.parseString(HTML.replace("$AUTHOR", AUTHORS))
+
+    author = grada._parse_authors(dom)
+
+    assert len(author) == 2
+    assert author[0].name == "Putšálek Monika"
+    assert author[0].URL == grada.BASE_URL + "/dalsi-knihy-autora/Putsalek_Monika/"
+    assert author[1].name == "Zich Franta"
+    assert author[1].URL == grada.BASE_URL + "/dalsi-knihy-autora/Zich_Franta/"
 
 
 def test_parse_description():
