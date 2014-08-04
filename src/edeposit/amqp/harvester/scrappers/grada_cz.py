@@ -82,11 +82,11 @@ def _parse_title_url(html_chunk):
     title = html_chunk.find("div", {"class": "comment"})
 
     if not title:
-        return _parse_alt_title(html_chunk)
+        return _parse_alt_title(html_chunk), None
 
     title = title[0].find("h2")
     if not title:
-        return _parse_alt_title(html_chunk)
+        return _parse_alt_title(html_chunk), None
 
     # look for the url of the book if present
     url = None

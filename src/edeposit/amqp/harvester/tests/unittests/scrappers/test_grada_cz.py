@@ -75,7 +75,20 @@ def test_parse_alt_title():
 
 
 def test_parse_title_url():
-    pass
+    dom = dhtmlparser.parseString(HTML)
+
+    title, url = grada._parse_title_url(dom)
+
+    assert title == "Main title"
+    assert url == grada.BASE_URL + "/url_to_the_catalog-6656489/kniha/katalog/"
+
+    # test alternative title lookup
+    title = dom.find("div", {"class": "comment"})
+    title[0].replaceWith(dhtmlparser.HTMLElement(""))
+
+    title, url = grada._parse_title_url(dom)
+    assert title == "Alt Main title"
+    assert url is None
 
 
 def test_parse_subtitle():
