@@ -3,35 +3,57 @@
 #
 # Interpreter version: python 2.7
 #
+"""
+Utilities used in scrappers.
+"""
 # Imports =====================================================================
 import dhtmlparser
 
 
-# Variables ===================================================================
-
-
-
 # Functions & objects =========================================================
 def _get_encoding(dom, default="utf-8"):
+    """
+    Try to look for meta tag in given `dom`.
+
+    Args:
+        dom (obj): pyDHTMLParser dom of HTML elements.
+        default (default "utr-8"): What to use if encoding is not found in
+                                   `dom`.
+
+    Returns:
+        str/default: Given encoding or `default` parameter if not found.
+    """
     encoding = dom.find("meta", {"http-equiv": "Content-Type"})
 
     if not encoding:
         return default
 
-    if "content" not in encoding[0].params:
-        return default
+    encoding = encoding[0].params.get("content", None)
 
-    encoding = encoding[0].params["content"]
+    if not encoding:
+        return default
 
     return encoding.lower().split("=")[-1]
 
 
 def handle_encodnig(html):
+    """
+    Look for encoding in given `html`. Try to convert `html` to utf-8.
+
+    Args:
+        html (str): HTML code as string.
+
+    Returns:
+        str: HTML code encoded in UTF.
+    """
     encoding = _get_encoding(
         dhtmlparser.parseString(
             html.split("</head>")[0]
         )
     )
+
+    if encoding == "utf-8":
+        return html
 
     return html.decode(encoding).encode("utf-8")
 
