@@ -5,7 +5,7 @@
 #
 # Imports =====================================================================
 import pytest
-import dhtmlparser as d
+import dhtmlparser
 
 from harvester.scrappers import grada_cz as grada
 
@@ -50,11 +50,11 @@ Here should be long description.
 type="hidden" name="kat1" value="6575" /> <input
 type="hidden" name="referer" value="/novinky/?start=0&krok=100" />
 <input name="pocet1" value="1" type="text" class="form t-r" size="1" />
-ks &nbsp; <input src="../images_buttons/objednat_off.gif" type="image" title="Objednat knihu: Main title" />
+ks &nbsp; <input src="../images_buttons/objednat_off.gif" type="image" title="Objednat knihu: Alt Main title" />
 </div>
 </form>
 </div>
-<a href="../url_to_the_catalog-6656489/kniha/katalog/" title="Detail knihy: Main title"><img src="../images_buttons/viceinformaci_off.gif" alt="Detail knihy: Main title" height="22" /></a>&nbsp;<img src="../images_buttons/novinka.gif" alt="Novinka" height="22" /> </div>
+<a href="../url_to_the_catalog-6656489/kniha/katalog/" title="Detail knihy: Alt Main title"><img src="../images_buttons/viceinformaci_off.gif" alt="Detail knihy: Alt Main title" height="22" /></a>&nbsp;<img src="../images_buttons/novinka.gif" alt="Novinka" height="22" /> </div>
 </div>
 </div>
 """
@@ -67,7 +67,11 @@ def test_normalize_url():
 
 
 def test_parse_alt_title():
-    pass
+    dom = dhtmlparser.parseString(HTML)
+
+    title = grada._parse_alt_title(dom)
+
+    assert title == "Alt Main title"
 
 
 def test_parse_title_url():

@@ -58,9 +58,15 @@ def _parse_alt_title(html_chunk):
     )
 
     assert title, "Can't find alternative title!"
+
+    title = title[0]
+
     assert "title" in title.params, "Can't find alternative title source!"
 
-    return title.params["title"].split(":", 1)[-1]
+    # title is stored as Bleh bleh: Title
+    title = title.params["title"].split(":", 1)[-1]
+
+    return title.strip()
 
 
 def _parse_title_url(html_chunk):
