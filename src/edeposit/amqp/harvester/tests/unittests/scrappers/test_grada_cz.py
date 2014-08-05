@@ -155,14 +155,36 @@ def test_parse_format_pages_isbn():
 
     book_format, pages, isbn = grada._parse_format_pages_isbn(alt_dom)
 
-    assert book_format == None
-    assert pages == None
-    assert isbn == None
+    assert book_format is None
+    assert pages is None
+    assert isbn is None
 
 
 def test_parse_price():
-    pass
+    price = grada._parse_price(dom)
 
+    assert price == "199 Kč"
+
+    alt_dom = dhtmlparser.parseString(HTML)
+    d = alt_dom.find("div", {"class": "prices"})[0]
+    d.replaceWith(dhtmlparser.HTMLElement())
+
+    price = grada._parse_price(alt_dom)
+
+    assert price is None
 
 def test_process_book():
-    pass
+    book = grada._process_book(dom)
+
+    assert book.title == "Main title"
+    assert book.authors == []
+    assert book.pages == "153 stran"
+    assert book.price == "199 Kč"
+    assert book.publisher == "Grada"
+
+    url = grada.BASE_URL + "/url_to_the_catalog-6656489/kniha/katalog/"
+    assert book.optionals.url == url
+    assert book.optionals.ISBN == "978-80-249-5701-0"
+    assert book.optionals.format == "17×24 cm"
+    assert book.optionals.sub_title == "Subtitle"
+    assert book.optionals.description == "Here should be long description."
