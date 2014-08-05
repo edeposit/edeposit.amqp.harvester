@@ -401,4 +401,13 @@ def self_test():
         assert book.price, error
         assert book.publisher, error
 
+        if book.optionals.ISBN:
+            assert len(book.optionals.ISBN) >= 10
+
+        if book.optionals.url:
+            protocol, rest = book.optionals.url.split(":", 1)
+
+            assert protocol.startswith("http")
+            assert rest.startswith("//")
+
     return True
