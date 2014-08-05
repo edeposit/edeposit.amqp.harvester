@@ -143,7 +143,21 @@ def test_parse_description():
 
 
 def test_parse_format_pages_isbn():
-    pass
+    book_format, pages, isbn = grada._parse_format_pages_isbn(dom)
+
+    assert book_format == "17×24 cm"
+    assert pages == "153 stran"
+    assert isbn == "978-80-249-5701-0"
+
+    alt_dom = dhtmlparser.parseString(HTML)
+    d = alt_dom.find("div", {"class": "price-overflow"})[0]
+    d.replaceWith(dhtmlparser.HTMLElement())
+
+    book_format, pages, isbn = grada._parse_format_pages_isbn(alt_dom)
+
+    assert book_format == None
+    assert pages == None
+    assert isbn == None
 
 
 def test_parse_price():
