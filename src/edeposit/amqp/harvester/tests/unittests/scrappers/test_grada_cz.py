@@ -131,7 +131,15 @@ def test_parse_authors_multiple_authors():
 
 
 def test_parse_description():
-    pass
+    descr = grada._parse_description(dom)
+    assert descr == "Here should be long description."
+
+    alt_dom = dhtmlparser.parseString(HTML)
+    d = alt_dom.find("div", {"class": "perex"})[0]
+    d.replaceWith(dhtmlparser.HTMLElement())
+
+    descr = grada._parse_description(alt_dom)
+    assert descr is None
 
 
 def test_parse_format_pages_isbn():
