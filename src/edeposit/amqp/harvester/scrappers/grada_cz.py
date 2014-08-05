@@ -7,13 +7,10 @@
 import httpkie
 import dhtmlparser
 
-from structures import Author
-from structures import Publication
-
 from utils import handle_encodnig, get_first_content
 
-# from ..structures import Author
-# from ..structures import Publication
+from ..structures import Author
+from ..structures import Publication
 
 
 # Variables ===================================================================
@@ -289,7 +286,27 @@ def self_test():
     Raises:
         AssertionError: When there is some problem.
     """
-    pass
+    books = get_publications()
 
+    assert len(books) > 0
 
-print len(get_publications())
+    for book in books:
+        error = "Book doesn't have all required parameters!\n"
+        error += str(book.to_namedtuple())
+
+        assert book.title, error
+        assert book.authors is not None, error  # can be blank
+        assert book.pages, error
+        assert book.price, error
+        assert book.publisher, error
+
+        if book.optionals.ISBN:
+            assert len(book.optionals.ISBN) >= 10
+
+        if book.optionals.url:
+            protocol, rest = book.optionals.url.split(":", 1)
+
+            assert protocol.startswith("http")
+            assert rest.startswith("//")
+
+    return True
