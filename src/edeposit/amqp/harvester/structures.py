@@ -99,9 +99,14 @@ class Publication(object):
 
         return opt_nt(**filt_dict)
 
-    def _get_hash(self):  # TODO: improve robustness of hashing
+    def _get_hash(self):
         if self.optionals and self.optionals.ISBN:
-            return self.optionals.ISBN
+            isbn = self.optionals.ISBN.replace("-", "")
+
+            if len(isbn) <= 10:
+                return "97880" + isbn
+
+            return isbn
 
         return self.title + ",".join(map(lambda x: x.name, self.authors))
 
