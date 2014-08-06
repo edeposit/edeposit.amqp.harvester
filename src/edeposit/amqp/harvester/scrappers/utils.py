@@ -84,3 +84,47 @@ def get_first_content(el_list, alt=None, strip=True):
         return alt
 
     return content
+
+
+def is_absolute_url(url, protocol="http"):
+    """
+    Test whether `url` is absolute url (``http://domain.tld/something``) or
+    relative (``../something``).
+
+    Args:
+        url (str): Tested string.
+        protocol (str, default "http"): Protocol which will be seek at the
+                 beginning of the `url`.
+
+    Returns:
+        bool: True if url is absolute, False if not.
+    """
+    if ":" not in url:
+        return False
+
+    protocol, rest = url.split(":", 1)
+
+    if protocol.startswith(protocol) and rest.startswith("//"):
+        return True
+
+    return False
+
+
+def normalize_url(base_url, rel_url):
+    """
+    Normalize the `url` - from relative, create absolute URL.
+
+    Args:
+        base_url (str): Domain with ``protocol://`` string
+        rel_url (str): Relative or absolute url.
+
+    Returns:
+        str/None: Normalized URL or None if `url` is blank.
+    """
+    if not rel_url:
+        return None
+
+    if not is_absolute_url(rel_url):
+        rel_url = base_url + rel_url.replace("../", "/")
+
+    return rel_url

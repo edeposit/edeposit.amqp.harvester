@@ -4,12 +4,9 @@
 # Interpreter version: python 2.7
 #
 # Imports =====================================================================
-import pytest
 import dhtmlparser
 
 from harvester.scrappers import grada_cz as grada
-
-from test_ben_cz import MockDownloader
 
 
 # Variables ===================================================================
@@ -62,11 +59,6 @@ dom = dhtmlparser.parseString(HTML)
 
 
 # Functions & objects =========================================================
-def test_normalize_url():
-    assert grada._normalize_url("../xex") == grada.BASE_URL + "/xex"
-    assert grada._normalize_url("/xex") == grada.BASE_URL + "/xex"
-
-
 def test_parse_alt_title():
     title = grada._parse_alt_title(dom)
 

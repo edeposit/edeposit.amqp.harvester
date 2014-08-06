@@ -7,8 +7,7 @@
 import httpkie
 import dhtmlparser
 
-from utils import handle_encodnig, get_first_content
-
+from utils import handle_encodnig, get_first_content, normalize_url
 from ..structures import Author
 from ..structures import Publication
 
@@ -20,25 +19,6 @@ DOWNER = httpkie.Downloader()
 
 
 # Functions & objects =========================================================
-def _normalize_url(url):
-    """
-    Normalize the `url` - from relative, create absolute URL.
-
-    Args:
-        url (str): Relative url.
-
-    Returns:
-        str/None: Normalized URL or None if `url` is blank.
-    """
-    if not url:
-        return None
-
-    if "http://" not in url:
-        url = BASE_URL + url.replace("../", "/")
-
-    return url
-
-
 def _parse_alt_title(html_chunk):
     """
     Parse title from alternative location if not found where it should be.
@@ -92,7 +72,7 @@ def _parse_title_url(html_chunk):
         url = url_tag[0].params.get("href", None)
         title = url_tag
 
-    return title[0].getContent(), _normalize_url(url)
+    return title[0].getContent(), normalize_url(BASE_URL, url)
 
 
 def _parse_subtitle(html_chunk):
@@ -137,7 +117,7 @@ def _parse_authors(html_chunk):
     authors = map(
         lambda x: Author(                            # create Author objects
             x.getContent().strip(),
-            _normalize_url(x.params.get("href", None))
+            normalize_url(BASE_URL, x.params.get("href", None))
         ),
         authors
     )
