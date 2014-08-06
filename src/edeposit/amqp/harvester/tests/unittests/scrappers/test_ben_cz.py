@@ -705,7 +705,6 @@ def test_process_book():
     pub = ben_cz._process_book("some_url")
 
     assert pub.title == "Title of the book."
-    assert pub.pages == "1 strana"
     assert pub.price == "100,00 Kč"
     assert pub.publisher == "BEN - technická literatura"
 
@@ -719,9 +718,10 @@ def test_process_book():
     assert pub.authors[3].name == "Fourth Author"
     assert pub.authors[3].URL == "fourth_url"
 
+    assert pub.optionals.pages == "1 strana"
     assert pub.optionals.ISBN == "978-80-7310-514-6"
     assert pub.optionals.EAN == "9788073105146"
-    assert pub.optionals.url == "some_url"
+    assert pub.optionals.URL == "some_url"
     assert pub.optionals.binding == "pevná"
     assert pub.optionals.edition == "1. české"
     assert pub.optionals.description == "Some description."

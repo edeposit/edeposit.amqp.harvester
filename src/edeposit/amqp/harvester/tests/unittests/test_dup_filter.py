@@ -38,7 +38,7 @@ def test_load_cache():
 
 
 def test_deduplicate():
-    p = Publication("title", [Author("author")], "pages", "price", "publisher")
+    p = Publication("title", [Author("author")], "price", "publisher")
 
     assert dup_filter.filter_publication(p) == p
     assert dup_filter.filter_publication(p) is None

@@ -11,12 +11,11 @@ from harvester.structures import Publication, Author
 
 # Functions & objects =========================================================
 def test_publication():
-    p = Publication("title", [Author("author")], "pages", "price", "publisher")
+    p = Publication("title", [Author("author")], "price", "publisher")
 
     # test properties of the Publication object
     assert p.title == "title"
     assert p.authors[0].name == "author"
-    assert p.pages == "pages"
     assert p.price == "price"
     assert p.publisher == "publisher"
 
@@ -30,7 +29,6 @@ def test_publication():
     nt = p.to_namedtuple()
     assert nt.title == "title"
     assert nt.authors[0].name == "author"
-    assert nt.pages == "pages"
     assert nt.price == 1
     assert nt.publisher == "publisher"
 

@@ -315,11 +315,11 @@ def _process_book(book_url):
     data = DOWNER.download(book_url)
     dom = dhtmlparser.parseString(data)
 
-    details = dom.find("div", {"id": "contentDetail"})
+    details_tags = dom.find("div", {"id": "contentDetail"})
 
-    assert details, "Can't find details of the book."
+    assert details_tags, "Can't find details of the book."
 
-    details = details[0]
+    details = details_tags[0]
 
     # parse required informations
     title = _parse_title(dom, details)
@@ -331,15 +331,15 @@ def _process_book(book_url):
     pub = Publication(
         title,
         authors,
-        pages,
         price,
         publisher
     )
 
     # parse optional informations
-    pub.optionals.url = book_url
+    pub.optionals.URL = book_url
     pub.optionals.binding = binding
 
+    pub.optionals.pages = pages
     pub.optionals.ISBN, pub.optionals.EAN = _parse_ISBN_EAN(details)
     pub.optionals.edition = _parse_edition(details)
     pub.optionals.description = _parse_description(details)
@@ -397,7 +397,6 @@ def self_test():
 
         assert book.title, error
         assert book.authors is not None, error  # can be blank
-        assert book.pages, error
         assert book.price, error
         assert book.publisher, error
 

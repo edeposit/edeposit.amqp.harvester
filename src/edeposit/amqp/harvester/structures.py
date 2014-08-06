@@ -32,10 +32,11 @@ class Optionals(object):
         self.pub_place = None
         self.ISBN = None
         self.description = None
+        self.pages = None
         self.EAN = None
         self.language = None
         self.edition = None  # vydání
-        self.url = None
+        self.URL = None
         self.binding = None
 
         self._any_set = False
@@ -61,9 +62,8 @@ class Optionals(object):
 
 
 class Publication(object):
-    def __init__(self, title, authors, pages, price, publisher):
+    def __init__(self, title, authors, price, publisher):
         self.title = title
-        self.pages = pages
         self.price = price
         self.publisher = publisher
 

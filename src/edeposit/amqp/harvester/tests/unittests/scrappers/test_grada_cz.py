@@ -170,12 +170,12 @@ def test_process_book():
 
     assert book.title == "Main title"
     assert book.authors == []
-    assert book.pages == "153 stran"
     assert book.price == "199 Kč"
     assert book.publisher == "Grada"
 
     url = grada.BASE_URL + "/url_to_the_catalog-6656489/kniha/katalog/"
-    assert book.optionals.url == url
+    assert book.optionals.pages == "153 stran"
+    assert book.optionals.URL == url
     assert book.optionals.ISBN == "978-80-249-5701-0"
     assert book.optionals.format == "17×24 cm"
     assert book.optionals.sub_title == "Subtitle"

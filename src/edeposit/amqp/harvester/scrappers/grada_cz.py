@@ -219,14 +219,14 @@ def _process_book(html_chunk):
     pub = Publication(
         title=title,
         authors=_parse_authors(html_chunk),
-        pages=pages,
         price=_parse_price(html_chunk),
         publisher="Grada"
     )
 
     # optional informations
-    pub.optionals.url = url
+    pub.optionals.URL = url
     pub.optionals.ISBN = isbn
+    pub.optionals.pages = pages
     pub.optionals.format = book_format
     pub.optionals.sub_title = _parse_subtitle(html_chunk)
     pub.optionals.description = _parse_description(html_chunk)
