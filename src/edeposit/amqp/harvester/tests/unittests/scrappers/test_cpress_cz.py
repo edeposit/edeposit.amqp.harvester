@@ -16,14 +16,15 @@ from harvester.scrappers import cpress_cz
 
 # Functions & objects =========================================================
 def test_parse_alt_title():
-    dom = dhtmlparser.parseString("""
+    dom = dhtmlparser.parseString(
+        """
         <div class="polozka">
         <div class="polozka_obrazek">
         <a href="zahadna-jizda-kralu/">
         <img width="90" alt="Záhadná jízda králů" src="typo3temp/pics/8def5efbad.jpg" height="140" /> </a>
         </div>
         </div>
-    """
+        """
     )
 
     alt_title = cpress_cz._parse_alt_title(dom)
@@ -32,12 +33,13 @@ def test_parse_alt_title():
 
 
 def test_parse_alt_title_not_found():
-    dom = dhtmlparser.parseString("""
+    dom = dhtmlparser.parseString(
+        """
         <div class="polozka">
         <div class="polozka_obrazek">
         <a href="zahadna-jizda-kralu/">
         </div>
-    """
+        """
     )
 
     with pytest.raises(UserWarning):
@@ -45,14 +47,66 @@ def test_parse_alt_title_not_found():
 
 
 def test_parse_alt_title_param_not_found():
-    dom = dhtmlparser.parseString("""
+    dom = dhtmlparser.parseString(
+        """
         <div class="polozka">
         <div class="polozka_obrazek">
         <a href="zahadna-jizda-kralu/">
         </div>
-    """
+        """
     )
 
     with pytest.raises(UserWarning):
         cpress_cz._parse_alt_title(dom)
 
+def test_parse_alt_url():
+    dom = dhtmlparser.parseString(
+        """
+        <div class="polozka">
+        <div class="polozka_obrazek">
+        <a href="zahadna-jizda-kralu/">
+        <img width="90" alt="Záhadná jízda králů" src="typo3temp/pics/8def5efbad.jpg" height="140" /> </a>
+        </div>
+        <div class="polozka_obsah">
+        <div class="polozka_popisy">
+        <div class="polozka_nazev">
+        </div>
+        <div class="polozka_autor"><a href="autori/autor/jiri-jilik/">Jiří Jilík</a></div>
+        <div class="polozka_podtitul">Nová kniha autora bestselleru Žítkovské čarování!</div>
+        </div>
+        <div class="polozka_cena">199&nbsp;Kč</div>
+        <div class="polozka_detail"><a href="zahadna-jizda-kralu/">Detail knihy</a></div>
+        </div>
+        </div>
+        """
+    )
+
+    url = cpress_cz._parse_alt_url(dom)
+
+    assert url
+    assert url == cpress_cz.normalize_url(cpress_cz.BASE_URL, "zahadna-jizda-kralu/")
+
+
+def test_parse_alt_url_not_found():
+    dom = dhtmlparser.parseString(
+        """
+        <div class="polozka">
+        <div class="polozka_obrazek">
+        <img width="90" alt="Záhadná jízda králů" src="typo3temp/pics/8def5efbad.jpg" height="140" /> </a>
+        </div>
+        <div class="polozka_obsah">
+        <div class="polozka_popisy">
+        <div class="polozka_nazev">
+        </div>
+        <div class="polozka_autor"><a href="autori/autor/jiri-jilik/">Jiří Jilík</a></div>
+        <div class="polozka_podtitul">Nová kniha autora bestselleru Žítkovské čarování!</div>
+        </div>
+        <div class="polozka_cena">199&nbsp;Kč</div>
+        </div>
+        </div>
+        """
+    )
+
+    url = cpress_cz._parse_alt_url(dom)
+
+    assert url is None
