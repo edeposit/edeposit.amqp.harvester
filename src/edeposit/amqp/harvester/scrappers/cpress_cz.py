@@ -100,6 +100,17 @@ def _parse_price(html_chunk):
     return get_first_content(price)
 
 
+def _parse_ean(html_chunk):
+    pass
+
+
+def _parse_date(html_chunk):
+    pass
+
+
+def _parse_format(html_chunk):
+    pass
+
 
 def _process_book(html_chunk):
     """
@@ -111,24 +122,27 @@ def _process_book(html_chunk):
     Returns:
         obj: :class:`structures.Publication` instance with book details.
     """
-    title, book_url = _parse_title_url(html_chunk)
-    authors = _parse_authors(html_chunk)
-
     # download page with details
     data = DOWNER.download(book_url)
     dom = dhtmlparser.parseString(
         handle_encodnig(data)
     )
+    details = dom.find("div", {"id": "kniha_detail"})[0]
 
-    print dom.find("div", {"id": "kniha_detail"})[0]
-    print "---"
+    # required parameters
+    title, book_url = _parse_title_url(html_chunk)
+    pub = Publication(
+        title=title,
+        authors=_parse_authors(html_chunk),
+        price=_parse_price(details),
+        publisher="CPress"
+    )
 
-    # pub = Publication(
-    #     title=title,
-    #     authors=_parse_authors(html_chunk),
-    #     price=_parse_price(html_chunk),
-    #     publisher="Grada"
-    # )
+    # optional parameters
+    pub.optionals.URL = book_url
+
+
+    return pub
 
 
 def get_publications():
