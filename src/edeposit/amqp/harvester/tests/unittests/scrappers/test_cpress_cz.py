@@ -110,3 +110,87 @@ def test_parse_alt_url_not_found():
     url = cpress_cz._parse_alt_url(dom)
 
     assert url is None
+
+
+def test_parse_title_url():
+    dom = dhtmlparser.parseString(
+        """
+        <div class="polozka">
+        <div class="polozka_obrazek">
+        <a href="zahadna-jizda-kralu/">
+        <img width="90" alt="Záhadná jízda králů" src="typo3temp/pics/8def5efbad.jpg" height="140" /> </a>
+        </div>
+        <div class="polozka_obsah">
+        <div class="polozka_popisy">
+        <div class="polozka_nazev">
+        <a href="zahadna-jizda-kralu/">Záhadná jízda králů</a>
+        </div>
+        <div class="polozka_autor"><a href="autori/autor/jiri-jilik/">Jiří Jilík</a></div>
+        <div class="polozka_podtitul">Nová kniha autora bestselleru Žítkovské čarování!</div>
+        </div>
+        <div class="polozka_cena">199&nbsp;Kč</div>
+        <div class="polozka_detail"><a href="zahadna-jizda-kralu/">Detail knihy</a></div>
+        </div>
+        </div>
+        """
+    )
+
+    title, url = cpress_cz._parse_title_url(dom)
+
+    assert title == "Záhadná jízda králů"
+    assert url == cpress_cz.normalize_url(cpress_cz.BASE_URL, "zahadna-jizda-kralu/")
+
+
+def test_parse_title_url_tag_not_found():
+    dom = dhtmlparser.parseString(
+        """
+        <div class="polozka">
+        <div class="polozka_obrazek">
+        <a href="zahadna-jizda-kralu/">
+        <img width="90" alt="Záhadná jízda králů" src="typo3temp/pics/8def5efbad.jpg" height="140" /> </a>
+        </div>
+        <div class="polozka_obsah">
+        <div class="polozka_popisy">
+        <div class="polozka_nazev">
+        </div>
+        <div class="polozka_autor"><a href="autori/autor/jiri-jilik/">Jiří Jilík</a></div>
+        <div class="polozka_podtitul">Nová kniha autora bestselleru Žítkovské čarování!</div>
+        </div>
+        <div class="polozka_cena">199&nbsp;Kč</div>
+        <div class="polozka_detail"><a href="zahadna-jizda-kralu/">Detail knihy</a></div>
+        </div>
+        </div>
+        """
+    )
+
+    title, url = cpress_cz._parse_title_url(dom)
+
+    assert title == "Záhadná jízda králů"
+    assert url == cpress_cz.normalize_url(cpress_cz.BASE_URL, "zahadna-jizda-kralu/")
+
+
+def test_parse_title_url_url_not_found():
+    dom = dhtmlparser.parseString(
+        """
+        <div class="polozka">
+        <div class="polozka_obrazek">
+        <img width="90" alt="Záhadná jízda králů" src="typo3temp/pics/8def5efbad.jpg" height="140" /> </a>
+        </div>
+        <div class="polozka_obsah">
+        <div class="polozka_popisy">
+        <div class="polozka_nazev">
+        </div>
+        <div class="polozka_autor"><a href="autori/autor/jiri-jilik/">Jiří Jilík</a></div>
+        <div class="polozka_podtitul">Nová kniha autora bestselleru Žítkovské čarování!</div>
+        </div>
+        <div class="polozka_cena">199&nbsp;Kč</div>
+        <div class="polozka_detail">Detail knihy</div>
+        </div>
+        </div>
+        """
+    )
+
+    title, url = cpress_cz._parse_title_url(dom)
+
+    assert title == "Záhadná jízda králů"
+    assert url is None
