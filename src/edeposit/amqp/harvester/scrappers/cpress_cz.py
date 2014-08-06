@@ -64,6 +64,31 @@ def _parse_title_url(html_chunk):
     return title, url
 
 
+def _parse_authors(html_chunk):
+    authors_tags = html_chunk.match(
+        ["div", {"class": "polozka_autor"}],
+        "a"
+    )
+
+    authors = []
+    for author_tag in authors_tags:
+        # get name
+        name = author_tag.getContent().strip()
+        if not name:
+            continue
+
+        # get url - if not found, set it to None
+        url = author_tag.params.get("href", None)
+        if url:
+            url = normalize_url(BASE_URL, url)
+
+        authors.append(
+            Author(name, url)
+        )
+
+    return authors
+
+
 
 def _process_book(html_chunk):
     """
@@ -75,7 +100,8 @@ def _process_book(html_chunk):
     Returns:
         obj: :class:`structures.Publication` instance with book details.
     """
-    title = html_chunk.find("")
+    title, url = _parse_title_url(html_chunk)
+    authors = _parse_authors(html_chunk)
 
     # pub = Publication(
     #     title=title,
