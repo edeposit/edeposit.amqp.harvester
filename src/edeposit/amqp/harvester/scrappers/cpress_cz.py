@@ -74,6 +74,8 @@ def _parse_authors(html_chunk):
     for author_tag in authors_tags:
         # get name
         name = author_tag.getContent().strip()
+
+        # skip tags without name
         if not name:
             continue
 
@@ -95,7 +97,7 @@ def _process_book(html_chunk):
     Parse available informations about book from the book details page.
 
     Args:
-        book_url (str): Absolute URL of the book.
+        html_chunk (obj): HTMLElement containing slice of the page with details.
 
     Returns:
         obj: :class:`structures.Publication` instance with book details.

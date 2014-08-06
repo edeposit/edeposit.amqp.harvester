@@ -24,7 +24,7 @@ def _parse_alt_title(html_chunk):
     Parse title from alternative location if not found where it should be.
 
     Args:
-        details (obj): HTMLElement containing slice of the page with deta
+        html_chunk (obj): HTMLElement containing slice of the page with details.
 
     Returns:
         str: Book's title.
@@ -51,7 +51,7 @@ def _parse_title_url(html_chunk):
     Parse title/name of the book and URL of the book.
 
     Args:
-        details (obj): HTMLElement containing slice of the page with details.
+        html_chunk (obj): HTMLElement containing slice of the page with details.
 
     Returns:
         str: Book's title.
@@ -80,7 +80,7 @@ def _parse_subtitle(html_chunk):
     Parse subtitle of the book.
 
     Args:
-        details (obj): HTMLElement containing slice of the page with details.
+        html_chunk (obj): HTMLElement containing slice of the page with details.
 
     Returns:
         str/None: Subtitle or None if subtitle wasn't found.
@@ -99,7 +99,7 @@ def _parse_authors(html_chunk):
     Parse authors of the book.
 
     Args:
-        details (obj): HTMLElement containing slice of the page with details.
+        html_chunk (obj): HTMLElement containing slice of the page with details.
 
     Returns:
         list: List of :class:`structures.Author` objects. Blank if no author \
@@ -206,7 +206,8 @@ def _process_book(html_chunk):
     Parse available informations about book from the book details page.
 
     Args:
-        book_url (str): Absolute URL of the book.
+        html_chunk (obj): HTMLElement containing slice of the page with details.
+
 
     Returns:
         obj: :class:`structures.Publication` instance with book details.
