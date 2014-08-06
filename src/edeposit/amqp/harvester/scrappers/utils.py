@@ -125,6 +125,27 @@ def normalize_url(base_url, rel_url):
         return None
 
     if not is_absolute_url(rel_url):
-        rel_url = base_url + rel_url.replace("../", "/")
+        rel_url = rel_url.replace("../", "/")
+
+        if (not base_url.endswith("/")) and (not rel_url.startswith("/")):
+            return base_url + "/" + rel_url.replace("../", "/")
+
+        return base_url + rel_url.replace("../", "/")
 
     return rel_url
+
+
+def has_param(param):
+    """
+    Generate function, which will check `param` in html element.
+    """
+    def has_param_closure(element):
+        """
+        Look for `param` in `element`.
+        """
+        if element.params.get(param, "").strip():
+            return True
+
+        return False
+
+    return has_param_closure
