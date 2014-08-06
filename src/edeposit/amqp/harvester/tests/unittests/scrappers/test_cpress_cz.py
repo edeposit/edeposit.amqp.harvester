@@ -194,3 +194,121 @@ def test_parse_title_url_url_not_found():
 
     assert title == "Záhadná jízda králů"
     assert url is None
+
+
+def test_parse_authors():
+    dom = dhtmlparser.parseString(
+        """
+        <div class="polozka">
+        <div class="polozka_obrazek">
+        <a href="zahadna-jizda-kralu/">
+        <img width="90" alt="Záhadná jízda králů" src="typo3temp/pics/8def5efbad.jpg" height="140" /> </a>
+        </div>
+        <div class="polozka_obsah">
+        <div class="polozka_popisy">
+        <div class="polozka_nazev">
+        <a href="zahadna-jizda-kralu/">Záhadná jízda králů</a>
+        </div>
+        <div class="polozka_autor"><a href="autori/autor/jiri-jilik/">Jiří Jilík</a></div>
+        <div class="polozka_podtitul">Nová kniha autora bestselleru Žítkovské čarování!</div>
+        </div>
+        <div class="polozka_cena">199&nbsp;Kč</div>
+        <div class="polozka_detail"><a href="zahadna-jizda-kralu/">Detail knihy</a></div>
+        </div>
+        </div>
+        """
+    )
+
+    authors = cpress_cz._parse_authors(dom)
+
+    assert authors
+    assert authors[0].name == "Jiří Jilík"
+    assert authors[0].URL == cpress_cz.normalize_url(cpress_cz.BASE_URL, "autori/autor/jiri-jilik/")
+
+
+def test_parse_authors_no_authors():
+    dom = dhtmlparser.parseString(
+        """
+        <div class="polozka">
+        <div class="polozka_obrazek">
+        <a href="zahadna-jizda-kralu/">
+        <img width="90" alt="Záhadná jízda králů" src="typo3temp/pics/8def5efbad.jpg" height="140" /> </a>
+        </div>
+        <div class="polozka_obsah">
+        <div class="polozka_popisy">
+        <div class="polozka_nazev">
+        <a href="zahadna-jizda-kralu/">Záhadná jízda králů</a>
+        </div>
+        <div class="polozka_autor"></div>
+        <div class="polozka_podtitul">Nová kniha autora bestselleru Žítkovské čarování!</div>
+        </div>
+        <div class="polozka_cena">199&nbsp;Kč</div>
+        <div class="polozka_detail"><a href="zahadna-jizda-kralu/">Detail knihy</a></div>
+        </div>
+        </div>
+        """
+    )
+
+    authors = cpress_cz._parse_authors(dom)
+
+    assert authors == []
+
+
+def test_parse_authors_no_authors_tag():
+    dom = dhtmlparser.parseString(
+        """
+        <div class="polozka">
+        <div class="polozka_obrazek">
+        <a href="zahadna-jizda-kralu/">
+        <img width="90" alt="Záhadná jízda králů" src="typo3temp/pics/8def5efbad.jpg" height="140" /> </a>
+        </div>
+        <div class="polozka_obsah">
+        <div class="polozka_popisy">
+        <div class="polozka_nazev">
+        <a href="zahadna-jizda-kralu/">Záhadná jízda králů</a>
+        </div>
+        <div class="polozka_podtitul">Nová kniha autora bestselleru Žítkovské čarování!</div>
+        </div>
+        <div class="polozka_cena">199&nbsp;Kč</div>
+        <div class="polozka_detail"><a href="zahadna-jizda-kralu/">Detail knihy</a></div>
+        </div>
+        </div>
+        """
+    )
+
+    authors = cpress_cz._parse_authors(dom)
+
+    assert authors == []
+
+def test_parse_authors_multiple_authors():
+    dom = dhtmlparser.parseString(
+        """
+        <div class="polozka">
+        <div class="polozka_obrazek">
+        <a href="zahadna-jizda-kralu/">
+        <img width="90" alt="Záhadná jízda králů" src="typo3temp/pics/8def5efbad.jpg" height="140" /> </a>
+        </div>
+        <div class="polozka_obsah">
+        <div class="polozka_popisy">
+        <div class="polozka_nazev">
+        <a href="zahadna-jizda-kralu/">Záhadná jízda králů</a>
+        </div>
+        <div class="polozka_autor"><a href="autori/autor/leos-kopecky/">Leoš Kopecký</a>, <a href="autori/autor/roswitha-kammerl/">Roswitha Kammerl</a></div>
+        <div class="polozka_podtitul">Nová kniha autora bestselleru Žítkovské čarování!</div>
+        </div>
+        <div class="polozka_cena">199&nbsp;Kč</div>
+        <div class="polozka_detail"><a href="zahadna-jizda-kralu/">Detail knihy</a></div>
+        </div>
+        </div>
+        """
+    )
+
+    authors = cpress_cz._parse_authors(dom)
+
+    assert authors
+    assert len(authors) == 2
+
+    assert authors[0].name == "Leoš Kopecký"
+    assert authors[0].URL == cpress_cz.normalize_url(cpress_cz.BASE_URL, "autori/autor/leos-kopecky/")
+    assert authors[1].name == "Roswitha Kammerl"
+    assert authors[1].URL == cpress_cz.normalize_url(cpress_cz.BASE_URL, "autori/autor/roswitha-kammerl/")
