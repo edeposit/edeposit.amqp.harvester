@@ -312,3 +312,35 @@ def test_parse_authors_multiple_authors():
     assert authors[0].URL == cpress_cz.normalize_url(cpress_cz.BASE_URL, "autori/autor/leos-kopecky/")
     assert authors[1].name == "Roswitha Kammerl"
     assert authors[1].URL == cpress_cz.normalize_url(cpress_cz.BASE_URL, "autori/autor/roswitha-kammerl/")
+
+
+def test_parse_price():
+    dom = dhtmlparser.parseString(
+        """
+        <div class="kniha_detail_cena">
+        <ul>
+        <li><label>((availability)):</label> <span>((availability_available))</span></li>
+        <li><label>Doporučená cena:</label> <span class="cena">299 Kč</span></li>
+        </ul>
+        </div>
+        """
+    )
+
+    price = cpress_cz._parse_price(dom)
+
+    assert price == "299 Kč"
+
+
+def test_parse_price_not_found():
+    dom = dhtmlparser.parseString(
+        """
+        <div class="kniha_detail_cena">
+        <ul>
+        <li><label>((availability)):</label> <span>((availability_available))</span></li>
+        </ul>
+        </div>
+        """
+    )
+
+    with pytest.raises(UserWarning):
+        cpress_cz._parse_price(dom)
