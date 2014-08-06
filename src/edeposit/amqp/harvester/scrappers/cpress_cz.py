@@ -45,13 +45,23 @@ def _parse_alt_url(html_chunk):
 
 def _parse_title_url(html_chunk):
     url = None
-    title = html_chunk.find("polozka_nazev")
+    title_tags = html_chunk.match(
+        ["div", {"class": "polozka_nazev"}],
+        ["a", None, has_param("href")]
+    )
 
-    if not title:
+    if not title_tags:
         return _parse_alt_title(html_chunk), _parse_alt_url(html_chunk)
 
+    title = title_tags[0]
 
-    title = html_chunk.find("img", fn=lambda x: x.params.get("alt", "").strip())
+    url = normalize_url(BASE_URL, title.params["href"])
+    title = title.getContent()
+
+    if not title:
+        title = _parse_alt_title(html_chunk)
+
+    return title, url
 
 
 
