@@ -91,6 +91,15 @@ def _parse_authors(html_chunk):
     return authors
 
 
+def _parse_price(html_chunk):
+    price = html_chunk.find("span", {"class": "cena"})
+
+    if not price:
+        raise UserWarning("Price not found!")
+
+    return get_first_content(price)
+
+
 
 def _process_book(html_chunk):
     """
@@ -102,13 +111,21 @@ def _process_book(html_chunk):
     Returns:
         obj: :class:`structures.Publication` instance with book details.
     """
-    title, url = _parse_title_url(html_chunk)
+    title, book_url = _parse_title_url(html_chunk)
     authors = _parse_authors(html_chunk)
+
+    # download page with details
+    data = DOWNER.download(book_url)
+    dom = dhtmlparser.parseString(
+        handle_encodnig(data)
+    )
+
+    print dom.find("div", {"id": "kniha_detail"})[0]
+    print "---"
 
     # pub = Publication(
     #     title=title,
     #     authors=_parse_authors(html_chunk),
-    #     pages=pages,
     #     price=_parse_price(html_chunk),
     #     publisher="Grada"
     # )
@@ -136,4 +153,4 @@ def get_publications():
 
     return books
 
-get_publications()
+# get_publications()
