@@ -33,12 +33,14 @@ def _parse_alt_title(html_chunk):
 
 
 def _parse_alt_url(html_chunk):
-    url = html_chunk.find("a", fn=has_param("href"))
+    url_list = html_chunk.find("a", fn=has_param("href"))
+    url_list = map(lambda x: x.params["href"], url_list)
+    url_list = filter(lambda x: not x.startswith("autori/"), url_list)
 
-    if not url:
+    if not url_list:
         return None
 
-    return normalize_url(BASE_URL, url[0].params["href"])
+    return normalize_url(BASE_URL, url_list[0])
 
 
 def _parse_title_url(html_chunk):
