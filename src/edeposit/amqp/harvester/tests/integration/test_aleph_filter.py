@@ -8,13 +8,9 @@ from harvester.filters import aleph_filter
 from harvester.structures import Publication
 
 
-# Variables ===================================================================
-
-
-
 # Functions & objects =========================================================
 def test_filter_publication():
-    p = Publication("ajksdhaklsjdh", "author", "pages", "price", "publisher")
+    p = Publication("ajksdhaklsjdh", "author", "price", "publisher")
 
     assert aleph_filter.filter_publication(p) == p  # not found
 
@@ -22,7 +18,6 @@ def test_filter_publication():
     p = Publication(
         "Umění programování v unixu",
         "random",
-        "",
         "",
         ""
     )
@@ -33,7 +28,6 @@ def test_filter_publication():
         "Umění programování v unixu",
         "Raymond",  # !
         "",
-        "",
         ""
     )
     assert aleph_filter.filter_publication(p) == None  # found
@@ -42,7 +36,6 @@ def test_filter_publication():
     p = Publication(
         "",
         "",  # !
-        "",
         "",
         ""
     )
