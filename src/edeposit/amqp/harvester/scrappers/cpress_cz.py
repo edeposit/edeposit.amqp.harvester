@@ -100,8 +100,37 @@ def _parse_price(html_chunk):
     return get_first_content(price)
 
 
+def _match_table(th_content):
+    def _match_table_closure(element):
+        # I need <tr> tag
+        if element.getTagName() != "tr":
+            return False
+
+        # containing in first level of childs <th> tag
+        th = element.match("th", absolute=True)
+        if not th:
+            return False
+
+        # which's content match `th_content`
+        if th[0].getContent() != th_content:
+            return False
+
+        # and also contains <td> tag
+        if not element.match("td", absolute=True):
+            return False
+
+        return True
+
+    return _match_table_closure
+
+
 def _parse_ean(html_chunk):
-    pass
+    ean_tag = html_chunk.find("tr", fn=_match_table("EAN:"))
+
+    if not ean_tag:
+        return None
+
+    return get_first_content(ean_tag[0].find("td"))
 
 
 def _parse_date(html_chunk):
