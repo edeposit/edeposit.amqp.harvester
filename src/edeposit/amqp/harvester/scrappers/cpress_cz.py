@@ -115,10 +115,12 @@ def _parse_ean(html_chunk):
 
 
 def _parse_date(html_chunk):
-    pass
+    return _parse_from_table(html_chunk, "Datum vydání:")
+
 
 def _parse_format(html_chunk):
-    pass
+    return _parse_from_table(html_chunk, "Formát:")
+
 
 def _process_book(html_chunk):
     """
