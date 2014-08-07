@@ -344,3 +344,45 @@ def test_parse_price_not_found():
 
     with pytest.raises(UserWarning):
         cpress_cz._parse_price(dom)
+
+
+def test_parse_ean():
+    dom = dhtmlparser.parseString(
+        """
+            <table>
+            <tr><th>Autor:</th> <td><a href="autori/autor/"> </a></td></tr>
+            <tr><th>Žánr:</th> <td><a href="vydali-jsme/?tx_odbooks%5Bgenre%5D=93&cHash=718a579059d52191c53e0eb0125608c2">komiks</a></td></tr>
+            <tr><th>Datum vydání:</th> <td>06. 08. 2014</td></tr>
+            <tr><th>EAN:</th> <td>9788026404620</td></tr>
+            </table>
+            <table>
+            <tr><th>Formát:</th> <td>210 x 297 mm brožovaná lepená</td></tr>
+            </table>
+            <br/>
+        """
+    )
+
+    ean = cpress_cz._parse_ean(dom)
+
+    assert ean == "9788026404620"
+
+
+def test_parse_not_found():
+    dom = dhtmlparser.parseString(
+        """
+            <table>
+            <tr><th>Autor:</th> <td><a href="autori/autor/"> </a></td></tr>
+            <tr><th>Žánr:</th> <td><a href="vydali-jsme/?tx_odbooks%5Bgenre%5D=93&cHash=718a579059d52191c53e0eb0125608c2">komiks</a></td></tr>
+            <tr><th>Datum vydání:</th> <td>06. 08. 2014</td></tr>
+            <tr><th>EAN:</th></tr>
+            </table>
+            <table>
+            <tr><th>Formát:</th> <td>210 x 297 mm brožovaná lepená</td></tr>
+            </table>
+            <br/>
+        """
+    )
+
+    ean = cpress_cz._parse_ean(dom)
+
+    assert ean is None
