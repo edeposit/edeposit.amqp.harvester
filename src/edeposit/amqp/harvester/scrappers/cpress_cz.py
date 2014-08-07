@@ -168,6 +168,20 @@ def _parse_format(html_chunk):
     return _parse_from_table(html_chunk, "Formát:")
 
 
+def _parse_description(html_chunk):
+    description_tag = html_chunk.match(
+        ["div", {"class": "kniha_detail_text"}],
+        "p"
+    )
+
+    if not description_tag:
+        return None
+
+    description = get_first_content(description_tag)
+    description = description.replace("<br />", "\n")
+
+    return dhtmlparser.removeTags(description)
+
 
 def _process_book(html_chunk):
     """
@@ -201,6 +215,7 @@ def _process_book(html_chunk):
     pub.optionals.EAN = _parse_ean(html_chunk)
     pub.optionals.format = _parse_format(html_chunk)
     pub.optionals.pub_date = _parse_date(html_chunk)
+    pub.optionals.description = _parse_description(html_chunk)
 
     return pub
 
