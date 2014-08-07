@@ -56,7 +56,7 @@ def _parse_title_url(html_chunk):
         html_chunk (obj): HTMLElement containing slice of the page with details.
 
     Returns:
-        str: Book's title.
+        tuple: (title, url), both as strings.
     """
     title = html_chunk.find("div", {"class": "comment"})
 
