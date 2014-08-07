@@ -12,6 +12,8 @@ This module downloads last 100 books published by ben.cz.
 import httpkie
 import dhtmlparser
 
+from utils import self_test_idiom
+
 from ..structures import Author
 from ..structures import Publication
 
@@ -387,26 +389,4 @@ def self_test():
     Raises:
         AssertionError: When there is some problem.
     """
-    books = get_publications()
-
-    assert len(books) > 0
-
-    for book in books:
-        error = "Book doesn't have all required parameters!\n"
-        error += str(book.to_namedtuple())
-
-        assert book.title, error
-        assert book.authors is not None, error  # can be blank
-        assert book.price, error
-        assert book.publisher, error
-
-        if book.optionals.ISBN:
-            assert len(book.optionals.ISBN) >= 10
-
-        if book.optionals.url:
-            protocol, rest = book.optionals.url.split(":", 1)
-
-            assert protocol.startswith("http")
-            assert rest.startswith("//")
-
-    return True
+    return self_test_idiom(get_publications)

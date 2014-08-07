@@ -178,3 +178,41 @@ def must_contain(tag_name, tag_content, container_tag_name):
         return True
 
     return must_contain_closure
+
+
+def self_test_idiom(fn):
+    """
+    Perform basic selftest.
+
+    Returns:
+        True: When everything is ok.
+
+    Raises:
+        AssertionError: When there is some problem.
+    """
+    books = fn()
+
+    assert len(books) > 0
+
+    for book in books:
+        error = "Book doesn't have all required parameters!\n"
+        error += str(book.to_namedtuple())
+
+        assert book.title, error
+        assert book.authors is not None, error  # can be blank
+        assert book.price, error
+        assert book.publisher, error
+
+        if book.optionals.ISBN:
+            assert len(book.optionals.ISBN) >= 10
+
+        if book.optionals.pages:
+            assert len(book.optionals.pages) >= 1
+
+        if book.optionals.URL:
+            protocol, rest = book.optionals.URL.split(":", 1)
+
+            assert protocol.startswith("http")
+            assert rest.startswith("//")
+
+    return True
