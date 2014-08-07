@@ -137,7 +137,9 @@ def normalize_url(base_url, rel_url):
 
 def has_param(param):
     """
-    Generate function, which will check `param` in html element.
+    Generate function, which will check `param` is in html element.
+
+    This function can be used as parameter for .find() method in HTMLElement.
     """
     def has_param_closure(element):
         """
@@ -149,3 +151,30 @@ def has_param(param):
         return False
 
     return has_param_closure
+
+
+def must_contain(tag_name, tag_content, container_tag_name):
+    """
+    Generate function, which checks if given element contains `tag_name` with
+    string content `tag_content` and also another tag named
+    `container_tag_name`.
+
+    This function can be used as parameter for .find() method in HTMLElement.
+    """
+    def must_contain_closure(element):
+        # containing in first level of childs <tag_name> tag
+        matching_tags = element.match(tag_name, absolute=True)
+        if not matching_tags:
+            return False
+
+        # which's content match `tag_content`
+        if matching_tags[0].getContent() != tag_content:
+            return False
+
+        # and also contains <container_tag_name> tag
+        if not element.match(container_tag_name, absolute=True):
+            return False
+
+        return True
+
+    return must_contain_closure
