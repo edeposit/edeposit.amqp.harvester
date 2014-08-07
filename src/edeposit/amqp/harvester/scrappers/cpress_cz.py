@@ -8,7 +8,7 @@ import httpkie
 import dhtmlparser
 
 from utils import handle_encodnig, get_first_content, normalize_url, has_param
-from utils import must_contain
+from utils import must_contain, self_test_idiom
 
 from structures import Author
 from structures import Publication
@@ -132,6 +132,8 @@ def _process_book(html_chunk):
     Returns:
         obj: :class:`structures.Publication` instance with book details.
     """
+    title, book_url = _parse_title_url(html_chunk)
+
     # download page with details
     data = DOWNER.download(book_url)
     dom = dhtmlparser.parseString(
@@ -140,7 +142,6 @@ def _process_book(html_chunk):
     details = dom.find("div", {"id": "kniha_detail"})[0]
 
     # required parameters
-    title, book_url = _parse_title_url(html_chunk)
     pub = Publication(
         title=title,
         authors=_parse_authors(html_chunk),
@@ -150,7 +151,9 @@ def _process_book(html_chunk):
 
     # optional parameters
     pub.optionals.URL = book_url
-
+    pub.optionals.EAN = _parse_ean(html_chunk)
+    pub.optionals.format = _parse_format(html_chunk)
+    pub.optionals.pub_date = _parse_date(html_chunk)
 
     return pub
 
@@ -177,4 +180,15 @@ def get_publications():
 
     return books
 
-# get_publications()
+
+def self_test():
+    """
+    Perform basic selftest.
+
+    Returns:
+        True: When everything is ok.
+
+    Raises:
+        AssertionError: When there is some problem.
+    """
+    return self_test_idiom(get_publications)
