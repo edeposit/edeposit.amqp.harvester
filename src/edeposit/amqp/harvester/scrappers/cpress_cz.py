@@ -25,6 +25,15 @@ DOWNER = httpkie.Downloader()
 
 # Functions & objects =========================================================
 def _parse_alt_title(html_chunk):
+    """
+    Parse title from alternative location if not found where it should be.
+
+    Args:
+        html_chunk (obj): HTMLElement containing slice of the page with details.
+
+    Returns:
+        str: Book's title.
+    """
     title = html_chunk.find("img", fn=has_param("alt"))
 
     if not title:
@@ -34,6 +43,15 @@ def _parse_alt_title(html_chunk):
 
 
 def _parse_alt_url(html_chunk):
+    """
+    Parse URL from alternative location if not found where it should be.
+
+    Args:
+        html_chunk (obj): HTMLElement containing slice of the page with details.
+
+    Returns:
+        str: Book's URL.
+    """
     url_list = html_chunk.find("a", fn=has_param("href"))
     url_list = map(lambda x: x.params["href"], url_list)
     url_list = filter(lambda x: not x.startswith("autori/"), url_list)
@@ -45,6 +63,15 @@ def _parse_alt_url(html_chunk):
 
 
 def _parse_title_url(html_chunk):
+    """
+    Parse title/name of the book and URL of the book.
+
+    Args:
+        html_chunk (obj): HTMLElement containing slice of the page with details.
+
+    Returns:
+        tuple: (title, url), both as strings.
+    """
     url = None
     title_tags = html_chunk.match(
         ["div", {"class": "polozka_nazev"}],
@@ -66,6 +93,16 @@ def _parse_title_url(html_chunk):
 
 
 def _parse_authors(html_chunk):
+    """
+    Parse authors of the book.
+
+    Args:
+        html_chunk (obj): HTMLElement containing slice of the page with details.
+
+    Returns:
+        list: List of :class:`structures.Author` objects. Blank if no author \
+              found.
+    """
     authors_tags = html_chunk.match(
         ["div", {"class": "polozka_autor"}],
         "a"
@@ -93,6 +130,15 @@ def _parse_authors(html_chunk):
 
 
 def _parse_price(html_chunk):
+    """
+    Parse price of the book.
+
+    Args:
+        html_chunk (obj): HTMLElement containing slice of the page with details.
+
+    Returns:
+        str/None: Price as string with currency or None if not found.
+    """
     price = html_chunk.find("span", {"class": "cena"})
 
     if not price:
@@ -120,6 +166,7 @@ def _parse_date(html_chunk):
 
 def _parse_format(html_chunk):
     return _parse_from_table(html_chunk, "Formát:")
+
 
 
 def _process_book(html_chunk):
