@@ -346,7 +346,7 @@ def test_parse_price_not_found():
         cpress_cz._parse_price(dom)
 
 
-def test_parse_ean_date_format_():
+def test_parse_ean_date_format():
     dom = dhtmlparser.parseString(
         """
             <table>
@@ -392,3 +392,34 @@ def test_parse_ean_date_format_not_found():
     assert ean is None
     assert date is None
     assert format is None
+
+
+def test_parse_description():
+    dom = dhtmlparser.parseString(
+        """
+        <div class="kniha_detail_autor"><a href="autori/autor/"> </a></div>
+        <div class="kniha_detail_text">
+        <p><br/> Description is <br/> here.<br/></span><span class="tecky"></span></p>
+        <span><a href="kaasdzasd#" id="vice">[více]</a></span>
+        </div>
+        <script>
+        """
+    )
+
+    description = cpress_cz._parse_description(dom)
+
+    assert description
+    assert description == "Description is \n here."
+
+
+def test_parse_description_not_found():
+    dom = dhtmlparser.parseString(
+        """
+        <div class="kniha_detail_autor"><a href="autori/autor/"> </a></div>
+        <script>
+        """
+    )
+
+    description = cpress_cz._parse_description(dom)
+
+    assert description is None
