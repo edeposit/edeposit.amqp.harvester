@@ -108,6 +108,9 @@ class Publication(object):
 
             return isbn
 
+        if self.optionals and self.optionals.EAN:
+            return self.optionals.EAN
+
         return self.title + ",".join(map(lambda x: x.name, self.authors))
 
     def __setattr__(self, key, val):
