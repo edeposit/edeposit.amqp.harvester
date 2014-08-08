@@ -10,11 +10,8 @@ import dhtmlparser
 from utils import handle_encodnig, get_first_content, normalize_url, has_param
 from utils import must_contain, self_test_idiom
 
-from structures import Author
-from structures import Publication
-
-# from ..structures import Author
-# from ..structures import Publication
+from ..structures import Author
+from ..structures import Publication
 
 
 # Variables ===================================================================
@@ -148,6 +145,13 @@ def _parse_price(html_chunk):
 
 
 def _parse_from_table(html_chunk, what):
+    """
+    Go thru table data in `html_chunk` and try to locate content of the
+    neighbor cell of the cell containing `what`.
+
+    Returns:
+        str: Table data or None.
+    """
     ean_tag = html_chunk.find("tr", fn=must_contain("th", what, "td"))
 
     if not ean_tag:
@@ -157,18 +161,54 @@ def _parse_from_table(html_chunk, what):
 
 
 def _parse_ean(html_chunk):
+    """
+    Parse EAN.
+
+    Args:
+        html_chunk (obj): HTMLElement containing slice of the page with details.
+
+    Returns:
+        str/None: EAN as string or None if not found.
+    """
     return _parse_from_table(html_chunk, "EAN:")
 
 
 def _parse_date(html_chunk):
+    """
+    Parse date.
+
+    Args:
+        html_chunk (obj): HTMLElement containing slice of the page with details.
+
+    Returns:
+        str/None: date as string or None if not found.
+    """
     return _parse_from_table(html_chunk, "Datum vydání:")
 
 
 def _parse_format(html_chunk):
+    """
+    Parse format.
+
+    Args:
+        html_chunk (obj): HTMLElement containing slice of the page with details.
+
+    Returns:
+        str/None: Format as string or None if not found.
+    """
     return _parse_from_table(html_chunk, "Formát:")
 
 
 def _parse_description(html_chunk):
+    """
+    Parse description of the book.
+
+    Args:
+        html_chunk (obj): HTMLElement containing slice of the page with details.
+
+    Returns:
+        str/None: Description as string or None if not found.
+    """
     description_tag = html_chunk.match(
         ["div", {"class": "kniha_detail_text"}],
         "p"
@@ -179,8 +219,9 @@ def _parse_description(html_chunk):
 
     description = get_first_content(description_tag)
     description = description.replace("<br />", "\n")
+    description = description.replace("<br/>", "\n")
 
-    return dhtmlparser.removeTags(description)
+    return dhtmlparser.removeTags(description).strip()
 
 
 def _process_book(html_chunk):
