@@ -15,21 +15,51 @@ import utils
 
 
 # Functions & objects =========================================================
+def read_config(files):
+    pass
+
+
 def _create_dom(dom):
     if not isinstance(dom, dhtmlparser.HTMLElement):
         dom = dhtmlparser.parseString(dom)
 
     dhtmlparser.makeDoubleLinked(dom)
 
-def _locate_elements(dom):
+    return dom
+
+
+def _locate_element(dom, el_content):
     pass
 
 
-def _collect_paths(dom, matches):
+def _match_elements(dom, matches):
+    out = {}
+    for key, content in matches.items():
+        matching_elements = _locate_element(dom, content)
+
+        if not matching_elements:
+            raise UserWarning(
+                "Can't locate element with content '%s'!" % content
+            )
+
+        if len(matching_elements) > 1:
+            raise UserWarning(
+                "Ambigious content '%s'!" % content
+                + "Content was found in multiple elements!"
+            )
+
+        out[key] = matching_elements[0]
+
+    return out
+
+
+def _collect_paths(elements):
+    pass
+
+def _filter_paths():
     dom = _create_dom(dom)
 
-    for key, match in matches:
-        pass
+
 
 
 
