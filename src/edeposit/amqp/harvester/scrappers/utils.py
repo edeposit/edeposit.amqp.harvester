@@ -172,12 +172,36 @@ def must_contain(tag_name, tag_content, container_tag_name):
             return False
 
         # and also contains <container_tag_name> tag
-        if not element.match(container_tag_name, absolute=True):
+        if container_tag_name and \
+           not element.match(container_tag_name, absolute=True):
             return False
 
         return True
 
     return must_contain_closure
+
+
+def content_matchs(tag_content, content_transformer=None):
+    """
+    Generate function, which checks whether the content of the tag matchs
+    `tag_content`.
+
+    Args:
+        tag_content (str): Content of the tag which will be matched thru whole
+                           DOM.
+        content_transformer (fn, default None): Function used to transform all
+                            tags before matching.
+
+    This function can be used as parameter for .find() method in HTMLElement.
+    """
+    def content_matchs_closure(element):
+        cont = element.getContent()
+        if content_transformer:
+            cont = content_transformer(cont)
+
+        return tag_content == cont
+
+    return content_matchs_closure
 
 
 def self_test_idiom(fn):
