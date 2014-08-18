@@ -19,17 +19,29 @@ def read_config(files):
     pass
 
 
-def _create_dom(dom):
-    if not isinstance(dom, dhtmlparser.HTMLElement):
-        dom = dhtmlparser.parseString(dom)
+def _create_dom(data):
+    """
+    Creates doublelinked DOM from `data`.
 
-    dhtmlparser.makeDoubleLinked(dom)
+    Args:
+        data (str/HTMLElement): Either string or HTML element.
 
-    return dom
+    Returns:
+        obj: HTMLElement containing double linked DOM.
+    """
+    if not isinstance(data, dhtmlparser.HTMLElement):
+        data = dhtmlparser.parseString(data)
+
+    dhtmlparser.makeDoubleLinked(data)
+
+    return data
 
 
 def _locate_element(dom, el_content):
-    pass
+    return dom.find(
+        "",
+        fn=utils.content_matchs(el_content)
+    )
 
 
 def _match_elements(dom, matches):
