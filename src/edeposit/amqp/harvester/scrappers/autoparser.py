@@ -9,6 +9,7 @@ import os.path
 import argparse
 
 import yaml
+import httpkie
 import dhtmlparser
 
 import utils
@@ -19,9 +20,41 @@ import utils
 
 
 # Functions & objects =========================================================
+def _process_config_item(item):
+    html = item.get("html", None)
+
+    if not html:
+        raise UserWarning("Can't find HTML source for item:\n%s" % str(item))
+
+    # process HTML link
+    if html.startswith("http://") or html.startswith("https://"):
+        down = httpkie.Downloader()
+        html = down.download(html)
+    elif os.path.exists(html):
+        with open(html) as f:
+            html = f.read()
+    else:
+        raise UserWarning("html: '%s' is neither URL or data!" % html)
+
+    del item["html"]
+    return {
+        "html": html,
+        "vars": item
+    }
+
+
 def read_config(file_name):
+    dirname = os.path.dirname(file_name)
+
+    config = []
     with open(file_name) as f:
-        return yaml.load_all(f.read())
+        os.chdir(dirname)
+        for item in yaml.load_all(f.read()):
+            config.append(
+                _process_config_item(item)
+            )
+
+    return config
 
 
 def _create_dom(data):
@@ -52,7 +85,7 @@ def _locate_element(dom, el_content, transformer=None):
 def _match_elements(dom, matches):
     out = {}
     for key, content in matches.items():
-        matching_elements = _locate_element(dom, content)
+        matching_elements = _locate_element(dom, content, lambda x: x.strip())
 
         if not matching_elements:
             raise UserWarning(
@@ -81,9 +114,14 @@ def _filter_paths():
     pass
 
 
-def select_best_paths(files):
-    config = read_config(file)
-    dom = _create_dom(dom)
+def select_best_paths(config):
+    first = config.pop(0)
+
+    dom = _create_dom(first["html"])
+    matching_elements = _match_elements(dom, first["vars"])
+
+    return matching_elements
+
 
 
 if __name__ == '__main__':
@@ -105,6 +143,10 @@ if __name__ == '__main__':
         sys.exit(1)
 
     config = read_config(args.config)
+
+    if not config:
+        sys.stderr.write("Configuration file '%s' is blank!\n" % args.config)
+        sys.exit(1)
 
     print select_best_paths(config)
 
