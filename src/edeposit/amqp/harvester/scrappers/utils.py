@@ -195,6 +195,9 @@ def content_matchs(tag_content, content_transformer=None):
     This function can be used as parameter for .find() method in HTMLElement.
     """
     def content_matchs_closure(element):
+        if not element.isTag():
+            return False
+
         cont = element.getContent()
         if content_transformer:
             cont = content_transformer(cont)

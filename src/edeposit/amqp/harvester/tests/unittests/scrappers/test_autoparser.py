@@ -31,4 +31,39 @@ def test_create_dom():
     assert dom.childs[0].parent is dom
 
 
+def test_locate_element():
+    data = "<xe>x</xe><xex>x</xex><xer>xx</xer>"
+    dom = autoparser._create_dom(data)
 
+    el = autoparser._locate_element(
+        dom,
+        "xx"
+    )
+    assert len(el) == 1
+    assert el[0].isTag()
+    assert el[0].getTagName() == "xer"
+    assert el[0].getContent() == "xx"
+
+    el = autoparser._locate_element(
+        dom,
+        "x"
+    )
+    assert len(el) == 2
+    assert el[0].isTag()
+    assert el[0].getTagName() == "xe"
+    assert el[0].getContent() == "x"
+
+
+def test_locate_element_transformer_param():
+    data = "<xe>x</xe><xex>x</xex><xer>xx</xer>"
+    dom = autoparser._create_dom(data)
+
+    el = autoparser._locate_element(
+        dom,
+        "XX",
+        lambda x: x.upper()
+    )
+    assert len(el) == 1
+    assert el[0].isTag()
+    assert el[0].getTagName() == "xer"
+    assert el[0].getContent() == "xx"

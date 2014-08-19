@@ -37,10 +37,10 @@ def _create_dom(data):
     return data
 
 
-def _locate_element(dom, el_content):
+def _locate_element(dom, el_content, transformer=None):
     return dom.find(
-        "",
-        fn=utils.content_matchs(el_content)
+        None,
+        fn=utils.content_matchs(el_content, transformer)
     )
 
 
