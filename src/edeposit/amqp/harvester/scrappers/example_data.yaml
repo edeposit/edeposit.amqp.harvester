@@ -1,0 +1,10 @@
+data: url
+var:
+    data: match
+    required: true
+    notfoundmsg: Can't find variable $name.
+another:
+    data: match2
+---
+data: xex
+...
