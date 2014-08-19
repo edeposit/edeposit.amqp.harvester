@@ -1,0 +1,17 @@
+<root>
+    something something
+    <sometag>something something</sometag>
+    <sometag>something something</sometag>
+    <xax>
+        something something
+        <sometag>something something</sometag>
+        <container>something wanted</container>
+        <sometag>something something</sometag>
+    </xax>
+    <sometag>something something</sometag>
+    <sometag>something something</sometag>
+    <container id="mycontent">another wanted thing</container>
+    <sometag>something something</sometag>
+    <sometag>something something</sometag>
+    something something
+</root>

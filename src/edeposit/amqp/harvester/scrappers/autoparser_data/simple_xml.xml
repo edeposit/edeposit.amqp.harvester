@@ -1,0 +1,12 @@
+<root>
+    something something
+    <sometag>something something</sometag>
+    <sometag>something something</sometag>
+    <xax>
+        something something
+        <container>i wan't this</container>
+    </xax>
+    <sometag>something something</sometag>
+    <container id="mycontent">and this</container>
+    something something
+</root>

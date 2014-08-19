@@ -1,0 +1,33 @@
+Autoparser generátor
+====================
+
+Script přijímá data ve formátu:
+
+---
+cesta k souboru s trénovacím vzorkem
+
+promenna = text ze vzorku
+promenna = text ze vzorku
+promenna = text ze vzorku
+promenna = text ze vzorku
+---
+
+Výsledkem je naplněná struktura obsahující data.
+
+Dat může a mělo by být více, aby se mohl generátor vytrénovat na širším vzorku.
+
+Algoritmus
+----------
+
+Vstupní data jsou převedeny na DOM.
+
+Jsou vyhledány konkrétní uzly odpovídající datům. Pokud je nalezeno vícero
+stejných uzlů, je běh přerušen a je požadováno nové zadání dat.
+
+Jsou vygenerovány cesty k uzlům a .match() cally, které mají uzly najít. Toto je
+provedeno pro všechny vzorky. Pokud nějaká cesta někde nefunguje, je odstraněna
+u všech vzorků.
+
+Je vybrána cesta s největší prioritou, či je dána možnost vybrat programátorovi.
+
+Je vygenerován generátor.

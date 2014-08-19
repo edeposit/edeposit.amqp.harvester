@@ -1,0 +1,15 @@
+html: simple_xml.xml
+first:
+    data: i wan't this
+    required: true
+    notfoundmsg: Can't find variable $name.
+second:
+    data: and this
+---
+html: simple_xml2.xml
+first:
+    data: something wanted
+    required: true
+    notfoundmsg: Can't find variable $name.
+second:
+    data: another wanted thing
