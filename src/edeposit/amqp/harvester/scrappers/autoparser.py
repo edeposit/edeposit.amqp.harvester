@@ -4,8 +4,12 @@
 # Interpreter version: python 2.7
 #
 # Imports =====================================================================
-import dhtmlparser
+import sys
+import os.path
+import argparse
 
+import yaml
+import dhtmlparser
 
 import utils
 
@@ -15,8 +19,9 @@ import utils
 
 
 # Functions & objects =========================================================
-def read_config(files):
-    pass
+def read_config(file_name):
+    with open(file_name) as f:
+        return yaml.load_all(f.read())
 
 
 def _create_dom(data):
@@ -65,15 +70,41 @@ def _match_elements(dom, matches):
     return out
 
 
+def _find_common_root(elements):
+    pass
+
+
 def _collect_paths(elements):
     pass
 
 def _filter_paths():
+    pass
+
+
+def select_best_paths(files):
+    config = read_config(file)
     dom = _create_dom(dom)
 
 
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description="Autoparser - parser generator."
+    )
+    parser.add_argument(
+        "-c",
+        "--config",
+        required=True,
+        help="""YAML Configuration file. This file is used to specify paths to
+                data and matches, which will be used to create generator."""
+    )
 
+    args = parser.parse_args()
 
+    if not os.path.exists(args.config):
+        sys.stderr.write("Can't open '%s'!\n" % args.config)
+        sys.exit(1)
 
-def create_parser(input):
-    pass
+    config = read_config(args.config)
+
+    print select_best_paths(config)
+
