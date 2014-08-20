@@ -188,8 +188,19 @@ def _find_common_root(elements):
 def _collect_paths(elements):
     pass
 
+
 def _filter_paths():
     pass
+
+
+def _el_to_path_vector(el):
+    path = [el]
+
+    while el:
+        path.append(el.parent)
+        el = el.parent
+
+    return reversed(path)
 
 
 def select_best_paths(config):
@@ -198,8 +209,9 @@ def select_best_paths(config):
     dom = _create_dom(first["html"])
     matching_elements = _match_elements(dom, first["vars"])
 
-    return matching_elements
+    only_elements = map(lambda (key, val): val["data"], data.items())
 
+    return matching_elements
 
 
 if __name__ == '__main__':
