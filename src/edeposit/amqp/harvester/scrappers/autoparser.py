@@ -76,6 +76,24 @@ def _create_dom(data):
 
 
 def _locate_element(dom, el_content, transformer=None):
+    """
+    Find element containing `el_content` in `dom`. Use `transformer` function
+    to content of all elements in `dom` in order to correctly transforming them
+    to match them with `el_content`.
+
+    Args:
+        dom (obj): HTMLElement tree.
+        el_content (str): Content of element will be picked from `dom`.
+        transformer (fn, default None): Transforming function.
+
+    Note:
+        `transformer` parameter can be for example simple lambda::
+
+            lambda x: x.strip()
+
+    Returns:
+        list: Matching HTMLElements.
+    """
     return dom.find(
         None,
         fn=utils.content_matchs(el_content, transformer)
