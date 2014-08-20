@@ -15,8 +15,6 @@ from harvester.scrappers import autoparser
 
 
 # Functions & objects =========================================================
-# with pytest.raises(AssertionError):
-
 def test_create_dom():
     data = "<xe>x</xe>"
 
@@ -67,3 +65,95 @@ def test_locate_element_transformer_param():
     assert el[0].isTag()
     assert el[0].getTagName() == "xer"
     assert el[0].getContent() == "xx"
+
+
+def test_match_elements():
+    dom = autoparser._create_dom(
+        """
+        <root>
+            something something
+            <sometag>something something</sometag>
+            <sometag>something something</sometag>
+            <xax>
+                something something
+                <container>i wan't this</container>
+            </xax>
+            <sometag>something something</sometag>
+            <container id="mycontent">and this</container>
+            something something
+        </root>
+        """
+    )
+
+    matches = {
+        "first": {
+            "data": "i wan't this",
+        },
+        "second": {
+            "data": "and this",
+        }
+    }
+
+    matching_elements = autoparser._match_elements(dom, matches)
+
+    assert matching_elements
+    assert len(matching_elements) == 2
+
+    assert matching_elements["first"]["data"].getContent() == matches["first"]["data"]
+    assert matching_elements["second"]["data"].getContent() == matches["second"]["data"]
+
+
+def test_match_elements_not_found():
+    dom = autoparser._create_dom(
+        """
+        <root>
+            something something
+            <sometag>something something</sometag>
+            <sometag>something something</sometag>
+            <xax>
+                something something
+                <container>i wan't this</container>
+            </xax>
+            <sometag>something something</sometag>
+            <container id="mycontent">and this</container>
+            something something
+        </root>
+        """
+    )
+
+    matches = {
+        "first": {
+            "data": "notfound_data",
+        }
+    }
+
+    with pytest.raises(UserWarning):
+        autoparser._match_elements(dom, matches)
+
+
+def test_match_elements_multiple_matches():
+    dom = autoparser._create_dom(
+        """
+        <root>
+            something something
+            <sometag>something something</sometag>
+            <sometag>something something</sometag>
+            <xax>
+                something something
+                <container>azgabash</container>
+            </xax>
+            <sometag>something something</sometag>
+            <container id="mycontent">azgabash</container>
+            something something
+        </root>
+        """
+    )
+
+    matches = {
+        "first": {
+            "data": "azgabash",
+        }
+    }
+
+    with pytest.raises(UserWarning):
+        autoparser._match_elements(dom, matches)
