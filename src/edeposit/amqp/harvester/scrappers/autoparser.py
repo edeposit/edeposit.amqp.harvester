@@ -21,6 +21,32 @@ import utils
 
 # Functions & objects =========================================================
 def _process_config_item(item):
+    """
+    Process one item from the configuration file, which contains multiple items
+    saved as dictionary.
+
+    This function reads additional data from the config and do some
+    replacements - for example, if you specify url, it will download data
+    from this url and so on.
+
+    Args:
+        item (dict): Item, which will be processed.
+
+    Note:
+        Returned data format::
+            {
+                "html": "html code from file/url",
+                "vars": {
+                    "varname": {
+                        "data": "matching data..",
+                        ...
+                    }
+                }
+            }
+
+    Returns:
+        dict: Dictionary in format showed above.
+    """
     html = item.get("html", None)
 
     if not html:
