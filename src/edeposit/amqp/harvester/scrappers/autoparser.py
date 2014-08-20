@@ -70,6 +70,32 @@ def _process_config_item(item):
 
 
 def read_config(file_name):
+    """
+    Read YAML file with configuration and pointers to example data.
+
+    Args:
+        file_name (str): Name of the file, where the configuration is stored.
+
+    Returns:
+        dict: Parsed and processed data (see :func:`_process_config_item`).
+
+    Example YAML file::
+        html: simple_xml.xml
+        first:
+            data: i wan't this
+            required: true
+            notfoundmsg: Can't find variable $name.
+        second:
+            data: and this
+        ---
+        html: simple_xml2.xml
+        first:
+            data: something wanted
+            required: true
+            notfoundmsg: Can't find variable $name.
+        second:
+            data: another wanted thing
+    """
     dirname = os.path.dirname(file_name)
 
     config = []
