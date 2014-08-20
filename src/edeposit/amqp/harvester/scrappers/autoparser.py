@@ -5,6 +5,7 @@
 #
 # Imports =====================================================================
 import sys
+import copy
 import os.path
 import argparse
 
@@ -153,7 +154,9 @@ def _locate_element(dom, el_content, transformer=None):
 
 
 def _match_elements(dom, matches):
-    for key, content in matches.items():
+    out = copy.deepcopy(matches)
+
+    for key, content in out.items():
         matching_elements = _locate_element(
             dom,
             content["data"],
@@ -175,7 +178,7 @@ def _match_elements(dom, matches):
 
         content["data"] = matching_elements[0]
 
-    return matches
+    return out
 
 
 def _find_common_root(elements):
