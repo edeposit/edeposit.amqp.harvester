@@ -83,14 +83,19 @@ def _locate_element(dom, el_content, transformer=None):
 
 
 def _match_elements(dom, matches):
-    out = {}
     for key, content in matches.items():
-        matching_elements = _locate_element(dom, content, lambda x: x.strip())
+        matching_elements = _locate_element(
+            dom,
+            content["data"],
+            transformer=lambda x: x.strip()
+        )
+
+        not_found_msg = "Can't locate element with content '%s'!" % key
+        if content.get("notfoundmsg"):
+            not_found_msg = content.get("notfoundmsg").replace("$name", key)
 
         if not matching_elements:
-            raise UserWarning(
-                "Can't locate element with content '%s'!" % content
-            )
+            raise UserWarning(not_found_msg)
 
         if len(matching_elements) > 1:
             raise UserWarning(
@@ -98,9 +103,9 @@ def _match_elements(dom, matches):
                 + "Content was found in multiple elements!"
             )
 
-        out[key] = matching_elements[0]
+        content["data"] = matching_elements[0]
 
-    return out
+    return matches
 
 
 def _find_common_root(elements):
