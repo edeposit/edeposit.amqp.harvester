@@ -230,54 +230,72 @@ def _collect_paths(element):  #TODO: test
     # common_root = _find_common_root(elements)
 
     def get_match(fn, *args, **kwargs):
-        return fn(*args, **kwargs)
+        return fn(*args, **kwargs).childs
 
+    output = []
+
+    # look for element by parameters - sometimes the ID is unique
+    path = _el_to_path_vector(element)
+    match = [0].find(el.getTagName(), el.params if el.params else None)
+
+    if len(match) == 1:
+        return [
+            (0, "find", [el.getTagName(), el.params if el.params else None])
+        ]
+
+    # look for element by paths from root to element
     index_backtrack = []
     last_index_backtrack = []
     params_backtrack = []
     last_params_backtrack = []
 
-    for el in reversed(_el_to_path_vector(element)):
+    for el in reversed(path):
         index = 0
         tag_name = el.getTagName()
 
         if el.parent:
             # match = el.parent.wfind(tag_name)
             match = get_match(lambda x: el.parent.wfind, tag_name)
-            index = match.childs.index(el)
+            index = match.index(el)
 
             index_backtrack.append(
                 (index, tag_name)
             )
             last_index_backtrack.append(
-                (index - len(match.childs), tag_name)
+                (index - len(match), tag_name)
             )
 
+            # if element has some parameters, use them for lookup
             if el.params:
                 match = get_match(
                     lambda x: el.parent.wfind,
                     tag_name,
                     el.params
                 )
-                index = match.childs.index(el)
+                index = match.index(el)
 
                 params_backtrack.append(
                     (index, [tag_name, el.params])
                 )
                 last_params_backtrack.append(
-                    (index - len(match.childs), [tag_name, el.params])
+                    (index - len(match), [tag_name, el.params])
                 )
             else:
                 params_backtrack.append(
                     (index, tag_name)
                 )
                 last_params_backtrack.append(
-                    (index - len(match.childs), tag_name)
+                    (index - len(match), tag_name)
                 )
 
-    # rekurzivni funkce, co zkousi find s parametrama, dokud nema jen jeden
+    output.extend([
+        params_backtrack,
+        last_params_backtrack,
+        index_backtrack,
+        last_index_backtrack,
+    ])
 
-
+    return outputs
 
 
 
