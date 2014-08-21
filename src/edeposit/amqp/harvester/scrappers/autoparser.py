@@ -21,7 +21,7 @@ import utils
 
 
 # Functions & objects =========================================================
-def _process_config_item(item):
+def _process_config_item(item):  #TODO: test
     """
     Process one item from the configuration file, which contains multiple items
     saved as dictionary.
@@ -70,7 +70,7 @@ def _process_config_item(item):
     }
 
 
-def read_config(file_name):
+def read_config(file_name):  #TODO: test
     """
     Read YAML file with configuration and pointers to example data.
 
@@ -181,19 +181,7 @@ def _match_elements(dom, matches):
     return out
 
 
-def _find_common_root(elements):
-    pass
-
-
-def _collect_paths(elements):
-    pass
-
-
-def _filter_paths():
-    pass
-
-
-def _el_to_path_vector(el):
+def _el_to_path_vector(el):  #TODO: test
     path = [el]
 
     while el:
@@ -203,13 +191,54 @@ def _el_to_path_vector(el):
     return reversed(path)
 
 
-def select_best_paths(config):
+def common_vector_root(vec1, vec2):  #TODO: test
+    root = []
+    for v1, v2 in zip(vec1, vec2):
+        if v1 == v2:
+            root.append(v1)
+        else:
+            return root
+
+    return root
+
+
+def _find_common_root(elements):  #TODO: test
+    if not elements:
+        raise UserWarning("Can't find common root - no elements suplied.")
+
+    root_path = _el_to_path_vector(elements.pop())
+
+    for el in elements:
+        el_path = _el_to_path_vector(el)
+
+        root_path = common_vector_root(root_path, el_path)
+
+        if not root_path:
+            raise UserWarning("Vectors without common root:\n%s" % str(el_path))
+
+    return root_path
+
+
+def _collect_paths(elements):  #TODO: test
+    pass
+
+
+def _filter_paths():  #TODO: test
+    pass
+
+
+def select_best_paths(config):  #TODO: test
     first = config.pop(0)
 
     dom = _create_dom(first["html"])
     matching_elements = _match_elements(dom, first["vars"])
 
-    only_elements = map(lambda (key, val): val["data"], data.items())
+    # optimization - don't do all operations from document root, but from
+    # the common root of all elements, which may be smaller
+    only_elements = map(
+        lambda (key, val): val["data"],
+        matching_elements.items()
+    )
 
     return matching_elements
 
