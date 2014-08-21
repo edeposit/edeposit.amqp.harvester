@@ -232,16 +232,45 @@ def _collect_paths(element):  #TODO: test
     def get_match(fn, *args, **kwargs):
         return fn(*args, **kwargs).childs
 
+    def params_or_none(params):
+        return params if params else None
+
     output = []
 
     # look for element by parameters - sometimes the ID is unique
     path = _el_to_path_vector(element)
-    match = [0].find(el.getTagName(), el.params if el.params else None)
+    root = path[0]
+    params = params_or_none(el.params)
+    match = root.find(element.getTagName(), params)
 
     if len(match) == 1:
-        return [
-            (0, "find", [el.getTagName(), el.params if el.params else None])
+        output.append(
+            ("find", 0, [element.getTagName(), params])
+        )
+
+    # look for element by neighbours
+    # parent = element.parent
+
+    # look for elements by patterns - element, which parent has tagname, and
+    # which parent has tagname ..
+    if el.parent and el.parent.parent:
+        trail = [
+            [element.getTagName(), params_or_none(element.params)],
+            [
+                element.parent.getTagName(),
+                params_or_none(element.parent.params)
+            ],
+            [
+                element.parent.parent.getTagName(),
+                params_or_none(element.parent.parent.params)
+            ]
         ]
+
+        match = root.match(*trail).childs
+        if element in match:
+            output.append(
+                ("match", match.index(element), trail)
+            )
 
     # look for element by paths from root to element
     index_backtrack = []
@@ -250,7 +279,6 @@ def _collect_paths(element):  #TODO: test
     last_params_backtrack = []
 
     for el in reversed(path):
-        index = 0
         tag_name = el.getTagName()
 
         if el.parent:
@@ -259,10 +287,10 @@ def _collect_paths(element):  #TODO: test
             index = match.index(el)
 
             index_backtrack.append(
-                (index, tag_name)
+                ("wfind", index, tag_name)
             )
             last_index_backtrack.append(
-                (index - len(match), tag_name)
+                ("wfind", index - len(match), tag_name)
             )
 
             # if element has some parameters, use them for lookup
@@ -275,17 +303,17 @@ def _collect_paths(element):  #TODO: test
                 index = match.index(el)
 
                 params_backtrack.append(
-                    (index, [tag_name, el.params])
+                    ("wfind", index, [tag_name, el.params])
                 )
                 last_params_backtrack.append(
-                    (index - len(match), [tag_name, el.params])
+                    ("wfind", index - len(match), [tag_name, el.params])
                 )
             else:
                 params_backtrack.append(
-                    (index, tag_name)
+                    ("wfind", index, tag_name)
                 )
                 last_params_backtrack.append(
-                    (index - len(match), tag_name)
+                    ("wfind", index - len(match), tag_name)
                 )
 
     output.extend([
