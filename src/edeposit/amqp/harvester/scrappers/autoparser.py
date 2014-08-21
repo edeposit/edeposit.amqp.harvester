@@ -219,11 +219,71 @@ def _find_common_root(elements):  #TODO: test
     return root_path
 
 
-def _collect_paths(elements):  #TODO: test
-    pass
+def _collect_paths(element):  #TODO: test
+    # optimization - don't do all operations from document root, but from
+    # the common root of all elements, which may be smaller
+    # only_elements = map(
+    #     lambda (key, val): val["data"],
+    #     elements.items()
+    # )
+
+    # common_root = _find_common_root(elements)
+
+    def get_match(fn, *args, **kwargs):
+        return fn(*args, **kwargs)
+
+    index_backtrack = []
+    last_index_backtrack = []
+    params_backtrack = []
+    last_params_backtrack = []
+
+    for el in reversed(_el_to_path_vector(element)):
+        index = 0
+        tag_name = el.getTagName()
+
+        if el.parent:
+            # match = el.parent.wfind(tag_name)
+            match = get_match(lambda x: el.parent.wfind, tag_name)
+            index = match.childs.index(el)
+
+            index_backtrack.append(
+                (index, tag_name)
+            )
+            last_index_backtrack.append(
+                (index - len(match.childs), tag_name)
+            )
+
+            if el.params:
+                match = get_match(
+                    lambda x: el.parent.wfind,
+                    tag_name,
+                    el.params
+                )
+                index = match.childs.index(el)
+
+                params_backtrack.append(
+                    (index, [tag_name, el.params])
+                )
+                last_params_backtrack.append(
+                    (index - len(match.childs), [tag_name, el.params])
+                )
+            else:
+                params_backtrack.append(
+                    (index, tag_name)
+                )
+                last_params_backtrack.append(
+                    (index - len(match.childs), tag_name)
+                )
+
+    # rekurzivni funkce, co zkousi find s parametrama, dokud nema jen jeden
 
 
-def _filter_paths():  #TODO: test
+
+
+
+
+
+def _filter_paths(paths, others):  #TODO: test
     pass
 
 
@@ -233,14 +293,9 @@ def select_best_paths(config):  #TODO: test
     dom = _create_dom(first["html"])
     matching_elements = _match_elements(dom, first["vars"])
 
-    # optimization - don't do all operations from document root, but from
-    # the common root of all elements, which may be smaller
-    only_elements = map(
-        lambda (key, val): val["data"],
-        matching_elements.items()
-    )
+    for el in matching_elements: # chce to nějak pořešit, že teď jde jen jedna cesta
+    paths = _collect_paths(matching_elements)
 
-    return matching_elements
 
 
 if __name__ == '__main__':
