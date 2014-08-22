@@ -227,7 +227,7 @@ def common_vector_root(vec1, vec2):
         [1, 2]
 
     Returns:
-        list: Common part of two vectors.
+        list: Common part of two vectors or blank list.
     """
     root = []
     for v1, v2 in zip(vec1, vec2):
@@ -239,7 +239,16 @@ def common_vector_root(vec1, vec2):
     return root
 
 
-def _find_common_root(elements):  #TODO: test
+def _find_common_root(elements):
+    """
+    Find root which is common for all `elements`.
+
+    Args:
+        elements (list): List of double-linked HTMLElement objects.
+
+    Returns:
+        list: Vector of HTMLElement containing path to common root.
+    """
     if not elements:
         raise UserWarning("Can't find common root - no elements suplied.")
 

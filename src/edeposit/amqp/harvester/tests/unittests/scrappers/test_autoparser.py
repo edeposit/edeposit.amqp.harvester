@@ -163,3 +163,18 @@ def test_common_vector_root():
     v2 = [1, 2, 8, 9, 0]
 
     assert autoparser.common_vector_root(v1, v2) == [1, 2]
+
+
+def test_find_common_root():
+    dom = autoparser._create_dom(EXAMPLE_DATA)
+
+    xax = dom.find("xax")[0]
+    container = dom.find("container")[0]
+
+    croot = autoparser._find_common_root([xax, container])
+
+    assert croot[0] == dom
+    assert croot[1] == dom.find("root")[0]
+    assert croot[2] == xax
+
+    assert len(croot) == 3
