@@ -154,6 +154,16 @@ def _locate_element(dom, el_content, transformer=None):
 
 
 def _match_elements(dom, matches):
+    """
+    Find location of elements matching patterns specified in `matches`.
+
+    Args:
+        dom (obj): HTMLElement DOM tree.
+        matches (dict): Structure: ``{"var": {"data": "match", ..}, ..}``.
+
+    Returns:
+        dict: Structure: ``{"var": {"data": HTMLElement_obj, ..}, ..}``
+    """
     out = copy.deepcopy(matches)
 
     for key, content in out.items():
