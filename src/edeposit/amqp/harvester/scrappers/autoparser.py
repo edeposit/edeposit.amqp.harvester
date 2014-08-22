@@ -213,7 +213,22 @@ def _el_to_path_vector(el):
     return reversed(path + [el])
 
 
-def common_vector_root(vec1, vec2):  #TODO: test
+def common_vector_root(vec1, vec2):
+    """
+    Return common root of the two vectors.
+
+    Args:
+        vec1 (list/tuple): First vector.
+        vec2 (list/tuple): Second vector.
+
+    Usage example::
+
+        >>> common_vector_root([1, 2, 3, 4, 5], [1, 2, 8, 9, 0])
+        [1, 2]
+
+    Returns:
+        list: Common part of two vectors.
+    """
     root = []
     for v1, v2 in zip(vec1, vec2):
         if v1 == v2:

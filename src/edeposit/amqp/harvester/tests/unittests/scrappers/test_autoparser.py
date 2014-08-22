@@ -156,3 +156,10 @@ def test_el_to_path_vector():
     assert vector[3] == el
 
     assert len(vector) == 4
+
+
+def test_common_vector_root():
+    v1 = [1, 2, 3, 4, 5]
+    v2 = [1, 2, 8, 9, 0]
+
+    assert autoparser.common_vector_root(v1, v2) == [1, 2]
