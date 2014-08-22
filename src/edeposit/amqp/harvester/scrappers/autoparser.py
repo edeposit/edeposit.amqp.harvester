@@ -219,6 +219,58 @@ def _find_common_root(elements):  #TODO: test
     return root_path
 
 
+def _params_or_none(params):
+    return params if params else None
+
+
+def _neighbours_pattern(element):  #TODO: test
+    def neighbour_to_params(neig_type, neighbour):
+        neighbour_data = None
+        if neighbour.isTag():
+            neighbour_data = (
+                neig_type + "_neighbour_tag",
+                0,
+                [
+                    neighbour.getTagName(),
+                    _params_or_none(neighbour.params),
+                    neighbour.getContent().strip()
+                ]
+            )
+        else:
+            neighbour_data = (
+                neig_type + "_neighbour_tag",
+                0,
+                [None, None, neighbour.getContent().strip()]
+            )
+
+        return neighbour_data
+
+    # check if there are any neighbours
+    if not element.parent or len(element.parent.childs) <= 1:
+        return []
+
+    parent = element.parent
+    neighbours = parent.childs
+    element_index = neighbours.index(element)
+
+    output = []
+    neighbour = None
+
+    # pick left neighbour
+    if element_index >= 1:
+        output.append(
+            neighbour_to_params("left", neighbours[element_index - 1])
+        )
+
+    # pick right neighbour
+    if element_index < len(neighbours) - 2:
+        output.append(
+            neighbour_to_params("right", neighbours[element_index + 1])
+        )
+
+    return output
+
+
 def _collect_paths(element):  #TODO: test
     # optimization - don't do all operations from document root, but from
     # the common root of all elements, which may be smaller
@@ -232,15 +284,12 @@ def _collect_paths(element):  #TODO: test
     def get_match(fn, *args, **kwargs):
         return fn(*args, **kwargs).childs
 
-    def params_or_none(params):
-        return params if params else None
-
     output = []
 
     # look for element by parameters - sometimes the ID is unique
     path = _el_to_path_vector(element)
     root = path[0]
-    params = params_or_none(el.params)
+    params = _params_or_none(el.params)
     match = root.find(element.getTagName(), params)
 
     if len(match) == 1:
@@ -249,20 +298,20 @@ def _collect_paths(element):  #TODO: test
         )
 
     # look for element by neighbours
-    # parent = element.parent
+    output.extend(_neighbours_pattern(element))
 
     # look for elements by patterns - element, which parent has tagname, and
     # which parent has tagname ..
-    if el.parent and el.parent.parent:
+    if element.parent and element.parent.parent:
         trail = [
-            [element.getTagName(), params_or_none(element.params)],
+            [element.getTagName(), _params_or_none(element.params)],
             [
                 element.parent.getTagName(),
-                params_or_none(element.parent.params)
+                _params_or_none(element.parent.params)
             ],
             [
                 element.parent.parent.getTagName(),
-                params_or_none(element.parent.parent.params)
+                _params_or_none(element.parent.parent.params)
             ]
         ]
 
@@ -317,10 +366,10 @@ def _collect_paths(element):  #TODO: test
                 )
 
     output.extend([
-        params_backtrack,
-        last_params_backtrack,
-        index_backtrack,
-        last_index_backtrack,
+        reversed(params_backtrack),
+        reversed(last_params_backtrack),
+        reversed(index_backtrack),
+        reversed(last_index_backtrack),
     ])
 
     return outputs
