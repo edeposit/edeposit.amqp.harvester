@@ -271,6 +271,29 @@ def _neighbours_pattern(element):  #TODO: test
     return output
 
 
+def _predecesors_pattern(element, root):
+    if not element.parent or not element.parent.parent:
+        return []
+
+    trail = [
+        [element.getTagName(), _params_or_none(element.params)],
+        [
+            element.parent.getTagName(),
+            _params_or_none(element.parent.params)
+        ],
+        [
+            element.parent.parent.getTagName(),
+            _params_or_none(element.parent.parent.params)
+        ]
+    ]
+
+    match = root.match(*trail).childs
+    if element in match:
+        return [
+            ("match", match.index(element), trail)
+        ]
+
+
 def _collect_paths(element):  #TODO: test
     # optimization - don't do all operations from document root, but from
     # the common root of all elements, which may be smaller
@@ -302,24 +325,7 @@ def _collect_paths(element):  #TODO: test
 
     # look for elements by patterns - element, which parent has tagname, and
     # which parent has tagname ..
-    if element.parent and element.parent.parent:
-        trail = [
-            [element.getTagName(), _params_or_none(element.params)],
-            [
-                element.parent.getTagName(),
-                _params_or_none(element.parent.params)
-            ],
-            [
-                element.parent.parent.getTagName(),
-                _params_or_none(element.parent.parent.params)
-            ]
-        ]
-
-        match = root.match(*trail).childs
-        if element in match:
-            output.append(
-                ("match", match.index(element), trail)
-            )
+    output.extend(_predecesors_pattern(element, root))
 
     # look for element by paths from root to element
     index_backtrack = []
