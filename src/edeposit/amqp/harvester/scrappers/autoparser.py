@@ -194,11 +194,11 @@ def _match_elements(dom, matches):
 def _el_to_path_vector(el):  #TODO: test
     path = [el]
 
-    while el:
-        path.append(el.parent)
+    while el.parent:
+        path.append(el)
         el = el.parent
 
-    return reversed(path)
+    return list(reversed(path))
 
 
 def common_vector_root(vec1, vec2):  #TODO: test
@@ -286,22 +286,27 @@ def _predecesors_pattern(element, root):
         return []
 
     trail = [
-        [element.getTagName(), _params_or_none(element.params)],
+        [
+            element.parent.parent.getTagName(),
+            _params_or_none(element.parent.parent.params)
+        ],
         [
             element.parent.getTagName(),
             _params_or_none(element.parent.params)
         ],
-        [
-            element.parent.parent.getTagName(),
-            _params_or_none(element.parent.parent.params)
-        ]
+        [element.getTagName(), _params_or_none(element.params)],
     ]
 
-    match = root.match(*trail).childs
+    match = root.match(*trail)
     if element in match:
         return [
             ("match", match.index(element), trail)
         ]
+
+
+# jsem na Déro robot!
+_reversed = reversed
+reversed = lambda sequence: list(_reversed(sequence))
 
 
 def _collect_paths(element):  #TODO: test
@@ -314,15 +319,12 @@ def _collect_paths(element):  #TODO: test
 
     # common_root = _find_common_root(elements)
 
-    def get_match(fn, *args, **kwargs):
-        return fn(*args, **kwargs).childs
-
     output = []
 
     # look for element by parameters - sometimes the ID is unique
     path = _el_to_path_vector(element)
     root = path[0]
-    params = _params_or_none(el.params)
+    params = _params_or_none(element.params)
     match = root.find(element.getTagName(), params)
 
     if len(match) == 1:
@@ -347,8 +349,7 @@ def _collect_paths(element):  #TODO: test
         tag_name = el.getTagName()
 
         if el.parent:
-            # match = el.parent.wfind(tag_name)
-            match = get_match(lambda x: el.parent.wfind, tag_name)
+            match = el.parent.wfind(tag_name).childs
             index = match.index(el)
 
             index_backtrack.append(
@@ -360,11 +361,7 @@ def _collect_paths(element):  #TODO: test
 
             # if element has some parameters, use them for lookup
             if el.params:
-                match = get_match(
-                    lambda x: el.parent.wfind,
-                    tag_name,
-                    el.params
-                )
+                match = el.parent.wfind(fn).childs(tag_name, el.params).childs
                 index = match.index(el)
 
                 params_backtrack.append(
@@ -388,7 +385,7 @@ def _collect_paths(element):  #TODO: test
         reversed(last_index_backtrack),
     ])
 
-    return outputs
+    return output
 
 
 
@@ -404,9 +401,9 @@ def select_best_paths(config):  #TODO: test
     dom = _create_dom(first["html"])
     matching_elements = _match_elements(dom, first["vars"])
 
-    for el in matching_elements: # chce to nějak pořešit, že teď jde jen jedna cesta
-    paths = _collect_paths(matching_elements)
-
+    # for el in matching_elements: # chce to nějak pořešit, že teď jde jen jedna cesta
+    paths = _collect_paths(matching_elements["first"]["data"])
+    print paths
 
 
 if __name__ == '__main__':
