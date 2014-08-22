@@ -11,7 +11,20 @@ from harvester.scrappers import autoparser
 
 
 # Variables ===================================================================
-
+EXAMPLE_DATA = """
+    <root>
+        something something
+        <sometag>something something</sometag>
+        <sometag>something something</sometag>
+        <xax>
+            something something
+            <container>i wan't this</container>
+        </xax>
+        <sometag>something something</sometag>
+        <container id="mycontent">and this</container>
+        something something
+    </root>
+"""
 
 
 # Functions & objects =========================================================
@@ -68,23 +81,7 @@ def test_locate_element_transformer_param():
 
 
 def test_match_elements():
-    dom = autoparser._create_dom(
-        """
-        <root>
-            something something
-            <sometag>something something</sometag>
-            <sometag>something something</sometag>
-            <xax>
-                something something
-                <container>i wan't this</container>
-            </xax>
-            <sometag>something something</sometag>
-            <container id="mycontent">and this</container>
-            something something
-        </root>
-        """
-    )
-
+    dom = autoparser._create_dom(EXAMPLE_DATA)
     matches = {
         "first": {
             "data": "i wan't this",
@@ -104,23 +101,7 @@ def test_match_elements():
 
 
 def test_match_elements_not_found():
-    dom = autoparser._create_dom(
-        """
-        <root>
-            something something
-            <sometag>something something</sometag>
-            <sometag>something something</sometag>
-            <xax>
-                something something
-                <container>i wan't this</container>
-            </xax>
-            <sometag>something something</sometag>
-            <container id="mycontent">and this</container>
-            something something
-        </root>
-        """
-    )
-
+    dom = autoparser._create_dom(EXAMPLE_DATA)
     matches = {
         "first": {
             "data": "notfound_data",
@@ -157,3 +138,21 @@ def test_match_elements_multiple_matches():
 
     with pytest.raises(UserWarning):
         autoparser._match_elements(dom, matches)
+
+
+def test_el_to_path_vector():
+    dom = autoparser._create_dom(EXAMPLE_DATA)
+    el = dom.find("container")
+
+    assert el
+
+    el = el[0]
+
+    vector = autoparser._el_to_path_vector(el)
+
+    assert vector[0] == dom
+    assert vector[1] == dom.find("root")[0]
+    assert vector[2] == dom.find("xax")[0]
+    assert vector[3] == el
+
+    assert len(vector) == 4

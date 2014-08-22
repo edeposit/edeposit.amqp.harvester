@@ -191,14 +191,26 @@ def _match_elements(dom, matches):
     return out
 
 
-def _el_to_path_vector(el):  #TODO: test
-    path = [el]
+_reversed = reversed  # jsem na Déro robot!
+reversed = lambda sequence: list(_reversed(sequence))
 
+
+def _el_to_path_vector(el):
+    """
+    Convert `el` to vector of foregoing elements.
+
+    Attr:
+        el (obj): Double-linked HTMLElement instance.
+
+    Returns:
+        list: HTMLElements which considered as path from root to `el`.
+    """
+    path = []
     while el.parent:
         path.append(el)
         el = el.parent
 
-    return list(reversed(path))
+    return reversed(path + [el])
 
 
 def common_vector_root(vec1, vec2):  #TODO: test
@@ -302,11 +314,6 @@ def _predecesors_pattern(element, root):
         return [
             ("match", match.index(element), trail)
         ]
-
-
-# jsem na Déro robot!
-_reversed = reversed
-reversed = lambda sequence: list(_reversed(sequence))
 
 
 def _collect_paths(element):  #TODO: test
