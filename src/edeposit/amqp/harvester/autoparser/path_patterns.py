@@ -8,10 +8,15 @@
 
 # Functions & objects =========================================================
 class PathCall(object):
-    def __init__(self, call_type, index, parameters):
+    def __init__(self, call_type, index, params):
         self.call_type = call_type
         self.index = index
-        self.parameters = parameters
+        self.params = params
+
+
+class Chained(object):
+    def __init__(self, chain):
+        self.chain = list(chain)
 
 
 def _params_or_none(params):

@@ -15,7 +15,7 @@ import autoparser.utils as utils
 import autoparser.conf_reader as conf_reader
 import autoparser.vectors as vectors
 import autoparser.path_patterns as path_patterns
-from autoparser.path_patterns import PathCall
+from autoparser.path_patterns import PathCall, Chained
 
 
 # Functions & objects =========================================================
@@ -166,10 +166,10 @@ def _collect_paths(element):  #TODO: test
             )
 
     output.extend([
-        reversed(params_backtrack),
-        reversed(last_params_backtrack),
-        reversed(index_backtrack),
-        reversed(last_index_backtrack),
+        Chained(reversed(params_backtrack)),
+        Chained(reversed(last_params_backtrack)),
+        Chained(reversed(index_backtrack)),
+        Chained(reversed(last_index_backtrack)),
     ])
 
     return output
@@ -180,12 +180,25 @@ def _is_working_path(dom, path, element):  #TODO: test
     Check whether the path is working or not.
     """
     path_functions = {
-        "find": lambda (el, index, params): el.find(*params)[index],
-        "wfind": lambda (el, index, params): el.wfind(*params).childs[index],
-        "match": lambda (el, index, params): el.match(*params)[index],
-        "left_neighbour_tag": 
-        "right_neighbour_tag": 
+        "find": lambda el, index, params: el.find(*params)[index],
+        "wfind": lambda el, index, params: el.wfind(*params).childs[index],
+        "match": lambda el, index, params: el.match(*params)[index],
+        "left_neighbour_tag": lambda el, index, params: el,
+        "right_neighbour_tag": lambda el, index, params: el
     }
+
+    if isinstance(path, PathCall):
+        el = path_functions[path.call_type](dom, path.index, path.params)
+    elif isinstance(path, Chained):
+        for path in path.chain:
+            dom = path_functions[path.call_type](dom, path.index, path.params)
+        el = dom
+    else:
+        raise UserWarning(
+            "Unknown type of path parameters! (%s)" % str(path.params)
+        )
+
+    return el.getContent().strip() == element.getContent().strip()
 
 
 def select_best_paths(examples):  #TODO: test
