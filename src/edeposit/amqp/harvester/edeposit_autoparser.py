@@ -11,11 +11,11 @@ import argparse
 
 import dhtmlparser
 
-import autoparser
 import autoparser.utils as utils
 import autoparser.conf_reader as conf_reader
 import autoparser.vectors as vectors
 import autoparser.path_patterns as path_patterns
+from autoparser.path_patterns import PathCall
 
 
 # Functions & objects =========================================================
@@ -114,7 +114,7 @@ def _collect_paths(element):  #TODO: test
 
     if len(match) == 1:
         output.append(
-            ("find", 0, [element.getTagName(), params])
+            PathCall("find", 0, [element.getTagName(), params])
         )
 
     # look for element by neighbours
@@ -140,10 +140,10 @@ def _collect_paths(element):  #TODO: test
         index = match.index(el)
 
         index_backtrack.append(
-            ("wfind", index, tag_name)
+            PathCall("wfind", index, [tag_name])
         )
         last_index_backtrack.append(
-            ("wfind", index - len(match), tag_name)
+            PathCall("wfind", index - len(match), [tag_name])
         )
 
         # if element has some parameters, use them for lookup
@@ -152,17 +152,17 @@ def _collect_paths(element):  #TODO: test
             index = match.index(el)
 
             params_backtrack.append(
-                ("wfind", index, [tag_name, el.params])
+                PathCall("wfind", index, [tag_name, el.params])
             )
             last_params_backtrack.append(
-                ("wfind", index - len(match), [tag_name, el.params])
+                PathCall("wfind", index - len(match), [tag_name, el.params])
             )
         else:
             params_backtrack.append(
-                ("wfind", index, tag_name)
+                PathCall("wfind", index, [tag_name])
             )
             last_params_backtrack.append(
-                ("wfind", index - len(match), tag_name)
+                PathCall("wfind", index - len(match), [tag_name])
             )
 
     output.extend([
@@ -175,22 +175,24 @@ def _collect_paths(element):  #TODO: test
     return output
 
 
-def _working_path(dom, path):  #TODO: test
+def _is_working_path(dom, path, element):  #TODO: test
     """
     Check whether the path is working or not.
     """
-    pass
+    path_functions = {
+        "find": lambda (el, index, params): el.find(*params)[index],
+        "wfind": lambda (el, index, params): el.wfind(*params).childs[index],
+        "match": lambda (el, index, params): el.match(*params)[index],
+        "left_neighbour_tag": 
+        "right_neighbour_tag": 
+    }
 
 
-def _filter_paths(matches, paths):
-    pass
+def select_best_paths(examples):  #TODO: test
+    possible_paths = {}  # {varname: [paths]}
 
-
-def select_best_paths(config):  #TODO: test
-    possible_paths = {}
-
-    # get list of all possible paths to all existing variables
-    for example in config:
+    # collect list of all possible paths to all existing variables
+    for example in examples:
         dom = _create_dom(example["html"])
         matching_elements = _match_elements(dom, example["vars"])
 
@@ -198,8 +200,23 @@ def select_best_paths(config):  #TODO: test
             if key not in possible_paths:  # TODO: merge paths together?
                 possible_paths[key] = _collect_paths(match)
 
-    # filter only paths, that works in all examples
     print possible_paths
+    print "---"
+
+    # leave only paths, that works in all examples where, are required
+    for example in examples:
+        dom = _create_dom(example["html"])
+        matching_elements = _match_elements(dom, example["vars"])
+
+        for key, paths in possible_paths.items():
+            if not key in matching_elements:
+                continue
+
+            paths = filter(
+                lambda path: _is_working_path(dom, path, matching_elements[key]),
+                paths
+            )
+
 
 
 
