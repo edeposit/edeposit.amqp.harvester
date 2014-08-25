@@ -392,7 +392,7 @@ def _collect_paths(element):  #TODO: test
 
             # if element has some parameters, use them for lookup
             if el.params:
-                match = el.parent.wfind(fn).childs(tag_name, el.params).childs
+                match = el.parent.wfind(tag_name, el.params).childs
                 index = match.index(el)
 
                 params_backtrack.append(
@@ -445,8 +445,8 @@ if __name__ == '__main__':
         "-c",
         "--config",
         required=True,
-        help="""YAML Configuration file. This file is used to specify paths to
-                data and matches, which will be used to create generator."""
+        help="""YAML Configuration file used to specify paths to data and
+                matches, which will be used to create generator."""
     )
 
     args = parser.parse_args()
