@@ -4,18 +4,17 @@
 # Interpreter version: python 2.7
 #
 # Imports =====================================================================
+from collections import namedtuple
 
 
 # Functions & objects =========================================================
-class PathCall(object):
-    def __init__(self, call_type, index, params):
-        self.call_type = call_type
-        self.index = index
-        self.params = params
+class PathCall(namedtuple("PathCall", ["call_type", "index", "params"])):
+    pass
 
 
 class Chained(object):
     def __init__(self, chain):
+        # necesarry because of reversed() and other iterator-returning functions
         self.chain = list(chain)
 
 
@@ -71,8 +70,8 @@ def predecesors_pattern(element, root):
     """
 
     Returns:
-        list: ``[PathCall()]` - list with one :class:`PathCall` object (to allow
-              use with ``.extend(predecesors_pattern())``).
+        list: ``[PathCall()]` - list with one :class:`PathCall` object (to
+              allow use with ``.extend(predecesors_pattern())``).
     """
     if not element.parent or not element.parent.parent:
         return []

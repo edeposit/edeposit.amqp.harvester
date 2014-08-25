@@ -99,10 +99,6 @@ def _match_elements(dom, matches):
     return out
 
 
-_reversed = reversed  # jsem na Déro robot!
-reversed = lambda sequence: list(_reversed(sequence))
-
-
 def _collect_paths(element):  #TODO: test
     output = []
 
@@ -179,14 +175,24 @@ def _is_working_path(dom, path, element):  #TODO: test
     """
     Check whether the path is working or not.
     """
+    def i_or_none(el, i):
+        if not el:
+            return None
+
+        return el[i]
+
     path_functions = {
-        "find": lambda el, index, params: el.find(*params)[index],
-        "wfind": lambda el, index, params: el.wfind(*params).childs[index],
-        "match": lambda el, index, params: el.match(*params)[index],
+        "find": lambda el, index, params:
+            i_or_none(el.find(*params), index),
+        "wfind": lambda el, index, params:
+            i_or_none(el.wfind(*params).childs, index),
+        "match": lambda el, index, params:
+            i_or_none(el.match(*params), index),
         "left_neighbour_tag": lambda el, index, params: el,
         "right_neighbour_tag": lambda el, index, params: el
     }
 
+    el = None
     if isinstance(path, PathCall):
         el = path_functions[path.call_type](dom, path.index, path.params)
     elif isinstance(path, Chained):
@@ -195,8 +201,11 @@ def _is_working_path(dom, path, element):  #TODO: test
         el = dom
     else:
         raise UserWarning(
-            "Unknown type of path parameters! (%s)" % str(path.params)
+            "Unknown type of path parameters! (%s)" % str(path)
         )
+
+    if not el:
+        return False
 
     return el.getContent().strip() == element.getContent().strip()
 
@@ -213,7 +222,7 @@ def select_best_paths(examples):  #TODO: test
             if key not in possible_paths:  # TODO: merge paths together?
                 possible_paths[key] = _collect_paths(match)
 
-    print possible_paths
+    print len(possible_paths["second"])
     print "---"
 
     # leave only paths, that works in all examples where, are required
@@ -225,10 +234,13 @@ def select_best_paths(examples):  #TODO: test
             if not key in matching_elements:
                 continue
 
-            paths = filter(
+            possible_paths[key] = filter(
                 lambda path: _is_working_path(dom, path, matching_elements[key]),
                 paths
             )
+
+    print len(possible_paths["second"])
+    print map(lambda x: str(x), possible_paths["second"])
 
 
 

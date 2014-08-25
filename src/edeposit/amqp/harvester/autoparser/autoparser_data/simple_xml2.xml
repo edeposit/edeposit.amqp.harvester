@@ -10,7 +10,7 @@
     </xax>
     <sometag>something something</sometag>
     <sometag>something something</sometag>
-    <container id="mycontent">another wanted thing</container>
+    <oi><container id="mycontent">another wanted thing</container></oi>
     <sometag>something something</sometag>
     <sometag>something something</sometag>
     something something
