@@ -42,7 +42,6 @@ def neighbours_pattern(element):  #TODO: test
     element_index = neighbours.index(element)
 
     output = []
-    neighbour = None
 
     # pick left neighbour
     if element_index >= 1:
