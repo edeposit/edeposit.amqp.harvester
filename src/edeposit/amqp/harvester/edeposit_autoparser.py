@@ -18,10 +18,6 @@ import autoparser.vectors as vectors
 import autoparser.path_patterns as path_patterns
 
 
-# Variables ===================================================================
-
-
-
 # Functions & objects =========================================================
 def _create_dom(data):
     """
@@ -77,9 +73,8 @@ def _match_elements(dom, matches):
     Returns:
         dict: Structure: ``{"var": {"data": HTMLElement_obj, ..}, ..}``
     """
-    out = copy.deepcopy(matches)
-
-    for key, content in out.items():
+    out = {}
+    for key, content in matches.items():
         matching_elements = _locate_element(
             dom,
             content["data"],
@@ -99,7 +94,7 @@ def _match_elements(dom, matches):
                 + "Content was found in multiple elements!"
             )
 
-        content["data"] = matching_elements[0]
+        out[key] = matching_elements[0]
 
     return out
 
@@ -192,17 +187,19 @@ def _filter_paths(matches, paths):
 
 
 def select_best_paths(config):  #TODO: test
-    first = config.pop(0)
+    possible_paths = {}
 
-    dom = _create_dom(first["html"])
-    matching_elements = _match_elements(dom, first["vars"])
+    # get list of all possible paths to all existing variables
+    for example in config:
+        dom = _create_dom(example["html"])
+        matching_elements = _match_elements(dom, example["vars"])
 
-    # for el in matching_elements: # chce to nějak pořešit, že teď jde jen jedna cesta
-    paths = _collect_paths(matching_elements["first"]["data"])
-    print paths
-    # print _working_path(dom, path)
+        for key, match in matching_elements.items():
+            if key not in possible_paths:  # TODO: merge paths together?
+                possible_paths[key] = _collect_paths(match)
 
-
+    # filter only paths, that works in all examples
+    print possible_paths
 
 
 
