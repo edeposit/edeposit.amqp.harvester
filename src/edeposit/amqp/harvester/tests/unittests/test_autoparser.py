@@ -7,7 +7,7 @@
 import pytest
 import dhtmlparser
 
-from harvester.scrappers import autoparser
+import harvester.edeposit_autoparser as autoparser
 
 
 # Variables ===================================================================
@@ -96,8 +96,8 @@ def test_match_elements():
     assert matching_elements
     assert len(matching_elements) == 2
 
-    assert matching_elements["first"]["data"].getContent() == matches["first"]["data"]
-    assert matching_elements["second"]["data"].getContent() == matches["second"]["data"]
+    assert matching_elements["first"].getContent() == matches["first"]["data"]
+    assert matching_elements["second"].getContent() == matches["second"]["data"]
 
 
 def test_match_elements_not_found():
@@ -138,43 +138,3 @@ def test_match_elements_multiple_matches():
 
     with pytest.raises(UserWarning):
         autoparser._match_elements(dom, matches)
-
-
-def test_el_to_path_vector():
-    dom = autoparser._create_dom(EXAMPLE_DATA)
-    el = dom.find("container")
-
-    assert el
-
-    el = el[0]
-
-    vector = autoparser._el_to_path_vector(el)
-
-    assert vector[0] == dom
-    assert vector[1] == dom.find("root")[0]
-    assert vector[2] == dom.find("xax")[0]
-    assert vector[3] == el
-
-    assert len(vector) == 4
-
-
-def test_common_vector_root():
-    v1 = [1, 2, 3, 4, 5]
-    v2 = [1, 2, 8, 9, 0]
-
-    assert autoparser.common_vector_root(v1, v2) == [1, 2]
-
-
-def test_find_common_root():
-    dom = autoparser._create_dom(EXAMPLE_DATA)
-
-    xax = dom.find("xax")[0]
-    container = dom.find("container")[0]
-
-    croot = autoparser._find_common_root([xax, container])
-
-    assert croot[0] == dom
-    assert croot[1] == dom.find("root")[0]
-    assert croot[2] == xax
-
-    assert len(croot) == 3
