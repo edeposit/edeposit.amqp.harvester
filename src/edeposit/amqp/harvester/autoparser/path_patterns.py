@@ -46,9 +46,16 @@ def neighbours_pattern(element):  #TODO: test
         return []
 
     parent = element.parent
-    neighbours = parent.childs
-    element_index = neighbours.index(element)
 
+    # filter only visible tags/neighbours
+    neighbours = filter(
+        lambda x: x.isTag() or x.getContent().strip() or x is element,
+        parent.childs
+    )
+    if len(neighbours) <= 1:
+        return []
+
+    element_index = neighbours.index(element)
     output = []
 
     # pick left neighbour
@@ -58,9 +65,9 @@ def neighbours_pattern(element):  #TODO: test
         )
 
     # pick right neighbour
-    if element_index < len(neighbours) - 2:
+    if element_index + 2 < len(neighbours):
         output.append(
-            neighbour_to_path_call("right", neighbours[element_index + 1])
+            neighbour_to_path_call("right", neighbours[element_index + 2])
         )
 
     return output
