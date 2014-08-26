@@ -3,6 +3,9 @@
 #
 # Interpreter version: python 2.7
 #
+"""
+This module contains all structures used in AMQP communication.
+"""
 # Imports =====================================================================
 from collections import namedtuple
 
@@ -111,6 +114,18 @@ class Optionals(object):
 
 
 class Publication(object):
+    """
+    This class contains only required minimal subset of informations about
+    `publication`.
+
+    Attributes:
+        title (str): Title of the book.
+        price (str): Price as string with currency.
+        publisher (str): Publishers name as string.
+        authors (list): List of :class:`Author` objects. May be blank.
+        optionals (obj): Reference to :class:`Optionals` object with optional
+                         informations.
+    """
     def __init__(self, title, authors, price, publisher):
         self.title = title
         self.price = price
@@ -128,6 +143,16 @@ class Publication(object):
         self._all_set = True
 
     def to_namedtuple(self):
+        """
+        Convert class and all subclasses (:class:`Author`, :class:`Optionals`)
+        to namedtuple.
+
+        Note:
+            This method is neccessary for AMQP communication.
+
+        Returns:
+            namedtuple: Representation of the class as simple structure.
+        """
         keys = filter(lambda x: not x.startswith("_"), self.__dict__)
         opt_nt = namedtuple(self.__class__.__name__, keys)
 
@@ -149,6 +174,15 @@ class Publication(object):
         return opt_nt(**filt_dict)
 
     def _get_hash(self):
+        """
+        Create hash of the class.
+
+        Hash should be unique for given ebook, so ISBN is main component of the
+        hash if provided.
+
+        Returns:
+            str: Hash.
+        """
         if self.optionals and self.optionals.ISBN:
             isbn = self.optionals.ISBN.replace("-", "")
 
