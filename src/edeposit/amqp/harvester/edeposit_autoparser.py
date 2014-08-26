@@ -30,7 +30,9 @@ def _create_dom(data):
         obj: HTMLElement containing double linked DOM.
     """
     if not isinstance(data, dhtmlparser.HTMLElement):
-        data = dhtmlparser.parseString(data)
+        data = dhtmlparser.parseString(
+            utils.handle_encodnig(data)
+        )
 
     dhtmlparser.makeDoubleLinked(data)
 
@@ -188,8 +190,16 @@ def _is_working_path(dom, path, element):  #TODO: test
             i_or_none(el.wfind(*params).childs, index),
         "match": lambda el, index, params:
             i_or_none(el.match(*params), index),
-        "left_neighbour_tag": lambda el, index, params: el,
-        "right_neighbour_tag": lambda el, index, params: el
+        "left_neighbour_tag": lambda el, index, params:
+            i_or_none(
+                el.find(None, None, fn=utils.has_neigh(*params, left=True)),
+                index
+            ),
+        "right_neighbour_tag": lambda el, index, params:
+            i_or_none(
+                el.find(None, None, fn=utils.has_neigh(*params, left=False)),
+                index
+            )
     }
 
     el = None
@@ -222,6 +232,7 @@ def select_best_paths(examples):  #TODO: test
             if key not in possible_paths:  # TODO: merge paths together?
                 possible_paths[key] = _collect_paths(match)
 
+    print map(lambda x: str(x), possible_paths["second"])
     print len(possible_paths["second"])
     print "---"
 
@@ -231,7 +242,7 @@ def select_best_paths(examples):  #TODO: test
         matching_elements = _match_elements(dom, example["vars"])
 
         for key, paths in possible_paths.items():
-            if not key in matching_elements:
+            if key not in matching_elements:
                 continue
 
             possible_paths[key] = filter(
