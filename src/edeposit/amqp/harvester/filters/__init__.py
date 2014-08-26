@@ -3,6 +3,10 @@
 #
 # Interpreter version: python 2.7
 #
+"""
+This module is used to make sure, that already processed books are removed from
+queue.
+"""
 # Imports =====================================================================
 import dup_filter
 import aleph_filter
