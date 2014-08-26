@@ -58,83 +58,6 @@ def handle_encodnig(html):
     return html.decode(encoding).encode("utf-8")
 
 
-def get_first_content(el_list, alt=None, strip=True):
-    """
-    Return content of the first element in `el_list` or `alt`. Also return `alt`
-    if the content string of first element is blank.
-
-    Args:
-        el_list (list): List of HTMLElement objects.
-        alt (default None): Value returner when list or content is blank.
-        strip (bool, default True): Call .strip() to content.
-
-    Returns:
-        str or alt: String representation of the content of the first element \
-                    or `alt` if not found.
-    """
-    if not el_list:
-        return alt
-
-    content = el_list[0].getContent()
-
-    if strip:
-        content = content.strip()
-
-    if not content:
-        return alt
-
-    return content
-
-
-def is_absolute_url(url, protocol="http"):
-    """
-    Test whether `url` is absolute url (``http://domain.tld/something``) or
-    relative (``../something``).
-
-    Args:
-        url (str): Tested string.
-        protocol (str, default "http"): Protocol which will be seek at the
-                 beginning of the `url`.
-
-    Returns:
-        bool: True if url is absolute, False if not.
-    """
-    if ":" not in url:
-        return False
-
-    protocol, rest = url.split(":", 1)
-
-    if protocol.startswith(protocol) and rest.startswith("//"):
-        return True
-
-    return False
-
-
-def normalize_url(base_url, rel_url):
-    """
-    Normalize the `url` - from relative, create absolute URL.
-
-    Args:
-        base_url (str): Domain with ``protocol://`` string
-        rel_url (str): Relative or absolute url.
-
-    Returns:
-        str/None: Normalized URL or None if `url` is blank.
-    """
-    if not rel_url:
-        return None
-
-    if not is_absolute_url(rel_url):
-        rel_url = rel_url.replace("../", "/")
-
-        if (not base_url.endswith("/")) and (not rel_url.startswith("/")):
-            return base_url + "/" + rel_url.replace("../", "/")
-
-        return base_url + rel_url.replace("../", "/")
-
-    return rel_url
-
-
 def has_param(param):
     """
     Generate function, which will check `param` is in html element.
@@ -207,39 +130,43 @@ def content_matchs(tag_content, content_transformer=None):
     return content_matchs_closure
 
 
-def self_test_idiom(fn):
-    """
-    Perform basic selftest.
+def has_neigh(tag_name, params=None, content=None, left=True):
+    def neigh_match(element):
+        if tag_name and tag_name != element.getTagName():
+            return False
 
-    Returns:
-        True: When everything is ok.
+        if params and element.containsParamSubset(params):
+            return False
 
-    Raises:
-        AssertionError: When there is some problem.
-    """
-    books = fn()
+        if content and content.strip() != element.getContent().strip():
+            return False
 
-    assert len(books) > 0
+        return True
 
-    for book in books:
-        error = "Book doesn't have all required parameters!\n"
-        error += str(book.to_namedtuple())
+    def has_neigh_closure(element):
+        if not element.parent:
+            return False
 
-        assert book.title, error
-        assert book.authors is not None, error  # can be blank
-        assert book.price, error
-        assert book.publisher, error
+        # childs = []
+        # if not (tag_name and params):
+        childs = element.parent.childs
+        # else:
+            # childs = filter(lambda x: x.isTag(), element.parent.childs)
 
-        if book.optionals.ISBN:
-            assert len(book.optionals.ISBN) >= 10
+        # filter only visible tags/neighbours
+        childs = filter(
+            lambda x: x.isTag() or x.getContent().strip() or x is element,
+            childs
+        )
+        if len(childs) <= 1:
+            return False
 
-        if book.optionals.pages:
-            assert len(book.optionals.pages) >= 1
+        ioe = childs.index(element)
+        if left and ioe > 0:
+            return neigh_match(childs[ioe - 1])
+        elif not left and ioe + 1 < len(childs):
+            return neigh_match(childs[ioe + 1])
 
-        if book.optionals.URL:
-            protocol, rest = book.optionals.URL.split(":", 1)
+        return False
 
-            assert protocol.startswith("http")
-            assert rest.startswith("//")
-
-    return True
+    return has_neigh_closure
