@@ -41,6 +41,30 @@ class Author(object):
 
 
 class Optionals(object):
+    """
+    Structure for holding optional informations about given publication.
+
+    Note:
+        This structure is usually used as container inside
+        :attr:`Publication.optionals`.
+
+    Attributes:
+        sub_title (str, default None):  Subtitle of the book.
+        format (str, default None): Format of the book - A5 for example.
+        pub_date (str, default None): Date when the book was published.
+        pub_place (str, default None): Name of the city, where the book was
+                                       published.
+        ISBN (str, default None): ISBN of the book.
+        description (str, default None): Description of the book, which may
+                    contain HTML tags and elements!
+        pages (str, default None): Number of pages.
+        EAN (str, default None): EAN of the book.
+        language (str, default None): Language of the book.
+        edition (str, default None): Edition in which the book was published.
+        URL (str, default None): URL to the eshop with the book.
+        binding (str, default None): Binding of the book (`brožovaná` for
+                                     example).
+    """
     def __init__(self):
         self.sub_title = None
         self.format = None
@@ -70,6 +94,15 @@ class Optionals(object):
         self.__dict__[key] = val
 
     def to_namedtuple(self):
+        """
+        Convert class to namedtuple.
+
+        Note:
+            This method is neccessary for AMQP communication.
+
+        Returns:
+            namedtuple: Representation of the class as simple structure.
+        """
         keys = filter(lambda x: not x.startswith("_"), self.__dict__)
         opt_nt = namedtuple(self.__class__.__name__, keys)
         filtered_dict = dict(map(lambda x: (x, self.__dict__[x]), keys))
