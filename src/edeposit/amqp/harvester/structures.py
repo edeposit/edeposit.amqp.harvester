@@ -9,11 +9,27 @@ from collections import namedtuple
 
 # Functions & objects =========================================================
 class Author(object):
+    """
+    Author name representation.
+
+    Attributes:
+        name (str): String containing author's name.
+        URL (str): URL to author's profile.
+    """
     def __init__(self, name, URL=None):
         self.name = name
         self.URL = URL
 
     def to_namedtuple(self):
+        """
+        Convert class to namedtuple.
+
+        Note:
+            This method is neccessary for AMQP communication.
+
+        Returns:
+            namedtuple: Representation of the class as simple structure.
+        """
         keys = filter(lambda x: not x.startswith("_"), self.__dict__)
         opt_nt = namedtuple(self.__class__.__name__, keys)
         filtered_dict = dict(map(lambda x: (x, self.__dict__[x]), keys))
