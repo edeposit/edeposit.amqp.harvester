@@ -84,7 +84,7 @@ setup(
         'setuptools',
         'pyyaml',
         'httpkie',
-        'pydhtmlparser>=2.0.2',
+        'pydhtmlparser>=2.0.5',
         'edeposit.amqp.aleph',
     ],
     extras_require={
