@@ -35,23 +35,24 @@ def _neighbour_to_path_call(neig_type, neighbour):
     return PathCall(neig_type + "_neighbour_tag", 0, params)
 
 
-def neighbours_pattern(element):  #TODO: test
+def neighbours_pattern(element):
     # check if there are any neighbours
-    if not element.parent or len(element.parent.childs) <= 1:
+    if not element.parent:
         return []
 
     parent = element.parent
 
     # filter only visible tags/neighbours
     neighbours = filter(
-        lambda x: x.isTag() or x.getContent().strip() or x is element,
+        lambda x: x.isTag() and not x.isEndTag() or x.getContent().strip() \
+                  or x is element,
         parent.childs
     )
     if len(neighbours) <= 1:
         return []
 
-    element_index = neighbours.index(element)
     output = []
+    element_index = neighbours.index(element)
 
     # pick left neighbour
     if element_index >= 1:
@@ -60,9 +61,9 @@ def neighbours_pattern(element):  #TODO: test
         )
 
     # pick right neighbour
-    if element_index + 2 < len(neighbours):
+    if element_index + 1 < len(neighbours):
         output.append(
-            _neighbour_to_path_call("right", neighbours[element_index + 2])
+            _neighbour_to_path_call("right", neighbours[element_index + 1])
         )
 
     return output
