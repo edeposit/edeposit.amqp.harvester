@@ -60,7 +60,115 @@ def test_neighbour_to_path_call_text():
 
 
 def test_neighbours_pattern():
-    pass
+    dom = dhtmlparser.parseString(
+        """
+        asd
+        <x>haxaxex</x>
+        <xex>\tHello</xex>
+        <xep></xep>
+        asd
+        """
+    )
+    dhtmlparser.makeDoubleLinked(dom)
+
+    xex = dom.find("xex")[0]
+    res = path_patterns.neighbours_pattern(xex)
+
+    assert res
+    assert len(res) == 2
+
+    left, right = res
+
+    assert left.call_type == "left_neighbour_tag"
+    assert left.index == 0
+    assert left.params == ["x", None, "haxaxex"]
+
+    assert right.call_type == "right_neighbour_tag"
+    assert right.index == 0
+    assert right.params == ["xep", None, ""]
+
+
+def test_neighbours_pattern_text_neigh():
+    dom = dhtmlparser.parseString(
+        """
+        asd
+        <xex>\tHello</xex>
+        <xep></xep>
+        asd
+        """
+    )
+    dhtmlparser.makeDoubleLinked(dom)
+
+    xex = dom.find("xex")[0]
+    res = path_patterns.neighbours_pattern(xex)
+
+    assert res
+    assert len(res) == 2
+
+    left, right = res
+
+    assert left.call_type == "left_neighbour_tag"
+    assert left.index == 0
+    assert left.params == [None, None, "asd"]
+
+    assert right.call_type == "right_neighbour_tag"
+    assert right.index == 0
+    assert right.params == ["xep", None, ""]
+
+
+def test_neighbours_pattern_left_corner():
+    dom = dhtmlparser.parseString(
+        """
+        <xex>\tHello</xex>
+        <xep></xep>
+        asd
+        """
+    )
+    dhtmlparser.makeDoubleLinked(dom)
+
+    xex = dom.find("xex")[0]
+    res = path_patterns.neighbours_pattern(xex)
+
+    assert res
+    assert len(res) == 1
+
+    assert res[0].call_type == "right_neighbour_tag"
+    assert res[0].index == 0
+    assert res[0].params == ["xep", None, ""]
+
+
+def test_neighbours_pattern_right_corner():
+    dom = dhtmlparser.parseString(
+        """
+        asd
+        <xex>\tHello</xex>
+        """
+    )
+    dhtmlparser.makeDoubleLinked(dom)
+
+    xex = dom.find("xex")[0]
+    res = path_patterns.neighbours_pattern(xex)
+
+    assert res
+    assert len(res) == 1
+
+    assert res[0].call_type == "left_neighbour_tag"
+    assert res[0].index == 0
+    assert res[0].params == [None, None, "asd"]
+
+
+def test_neighbours_pattern_both_corners():
+    dom = dhtmlparser.parseString(
+        """
+        <xex>\tHello</xex>
+        """
+    )
+    dhtmlparser.makeDoubleLinked(dom)
+
+    xex = dom.find("xex")[0]
+    res = path_patterns.neighbours_pattern(xex)
+
+    assert not res
 
 
 def test_predecesors_pattern():
