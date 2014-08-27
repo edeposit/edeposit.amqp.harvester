@@ -135,12 +135,12 @@ def _collect_paths(element):  #TODO: test
     # which parent has tagname ..
     output.extend(path_patterns.predecesors_pattern(element, root))
 
-    # look for element by paths from root to element
     index_backtrack = []
     last_index_backtrack = []
     params_backtrack = []
     last_params_backtrack = []
 
+    # look for element by paths from root to element
     for el in reversed(path):
         # skip root elements
         if not el.parent:
@@ -290,14 +290,32 @@ def select_best_paths(examples):  #TODO: test
                 continue
 
             possible_paths[key] = filter(
-                lambda path: _is_working_path(dom, path, matching_elements[key]),
+                lambda path: _is_working_path(
+                    dom,
+                    path,
+                    matching_elements[key]
+                ),
                 paths
             )
 
-    print len(possible_paths["second"])
-    print map(lambda x: str(x), possible_paths["second"])
+    priorities = [
+        "find",
+        "left_neighbour_tag",
+        "right_neighbour_tag",
+        "wfind",
+        "match",
+        "Chained"
+    ]
+    priorities = dict(map(lambda x: (x[1], x[0]), enumerate(priorities)))
 
+    # sort all paths by priority table
+    for key in possible_paths.keys():
+        possible_paths[key] = list(sorted(
+            possible_paths[key],
+            key=lambda x: priorities.get(x.call_type, 100)
+        ))
 
+    return possible_paths
 
 
 if __name__ == '__main__':

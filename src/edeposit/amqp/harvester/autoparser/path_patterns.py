@@ -24,6 +24,10 @@ class Chained(object):
         # necesarry because of reversed() and other iterator-returning functions
         self.chain = list(chain)
 
+    @property
+    def call_type(self):
+        return "Chained"
+
 
 def _params_or_none(params):
     return params if params else None
