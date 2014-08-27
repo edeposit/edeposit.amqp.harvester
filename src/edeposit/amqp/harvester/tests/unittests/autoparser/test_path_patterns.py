@@ -9,10 +9,6 @@ import dhtmlparser
 from harvester.autoparser import path_patterns
 
 
-# Variables ===================================================================
-
-
-
 # Functions & objects =========================================================
 def test_PathCall():
     params = ["type", "index", "params"]
@@ -39,24 +35,28 @@ def test_neighbour_to_path_call():
     dom = dhtmlparser.parseString("<xex>\tHello   </xex>")
     xex = dom.find("xex")[0]
 
-    res = path_patterns._neighbour_to_path_call("left", xex)
+    res = path_patterns._neighbour_to_path_call("left", xex, xex)
 
     assert isinstance(res, path_patterns.PathCall)
     assert res.call_type == "left_neighbour_tag"
     assert res.index == 0
-    assert res.params == ["xex", None, "Hello"]
+    assert res.params.tag_name == "xex"
+    assert res.params.params == None
+    assert res.params.fn_params == ["xex", None, "Hello"]
 
 
 def test_neighbour_to_path_call_text():
     dom = dhtmlparser.parseString("<xex>\tHello   </xex>")
     text = dom.find("xex")[0].childs[0]
 
-    res = path_patterns._neighbour_to_path_call("left", text)
+    res = path_patterns._neighbour_to_path_call("left", text, text)
 
     assert isinstance(res, path_patterns.PathCall)
     assert res.call_type == "left_neighbour_tag"
     assert res.index == 0
-    assert res.params == [None, None, "Hello"]
+    assert res.params.tag_name == "\tHello   "
+    assert res.params.params == None
+    assert res.params.fn_params == [None, None, "Hello"]
 
 
 def test_neighbours_pattern():
@@ -81,11 +81,15 @@ def test_neighbours_pattern():
 
     assert left.call_type == "left_neighbour_tag"
     assert left.index == 0
-    assert left.params == ["x", None, "haxaxex"]
+    assert left.params.tag_name == "xex"
+    assert left.params.params == None
+    assert left.params.fn_params == ["x", None, "haxaxex"]
 
     assert right.call_type == "right_neighbour_tag"
     assert right.index == 0
-    assert right.params == ["xep", None, ""]
+    assert right.params.tag_name == "xex"
+    assert right.params.params == None
+    assert right.params.fn_params == ["xep", None, ""]
 
 
 def test_neighbours_pattern_text_neigh():
@@ -109,11 +113,15 @@ def test_neighbours_pattern_text_neigh():
 
     assert left.call_type == "left_neighbour_tag"
     assert left.index == 0
-    assert left.params == [None, None, "asd"]
+    assert res[0].params.tag_name == "xex"
+    assert res[0].params.params == None
+    assert left.params.fn_params == [None, None, "asd"]
 
     assert right.call_type == "right_neighbour_tag"
     assert right.index == 0
-    assert right.params == ["xep", None, ""]
+    assert res[0].params.tag_name == "xex"
+    assert res[0].params.params == None
+    assert right.params.fn_params == ["xep", None, ""]
 
 
 def test_neighbours_pattern_left_corner():
@@ -134,7 +142,9 @@ def test_neighbours_pattern_left_corner():
 
     assert res[0].call_type == "right_neighbour_tag"
     assert res[0].index == 0
-    assert res[0].params == ["xep", None, ""]
+    assert res[0].params.tag_name == "xex"
+    assert res[0].params.params == None
+    assert res[0].params.fn_params == ["xep", None, ""]
 
 
 def test_neighbours_pattern_right_corner():
@@ -154,7 +164,9 @@ def test_neighbours_pattern_right_corner():
 
     assert res[0].call_type == "left_neighbour_tag"
     assert res[0].index == 0
-    assert res[0].params == [None, None, "asd"]
+    assert res[0].params.tag_name == "xex"
+    assert res[0].params.params == None
+    assert res[0].params.fn_params == [None, None, "asd"]
 
 
 def test_neighbours_pattern_both_corners():
@@ -172,4 +184,47 @@ def test_neighbours_pattern_both_corners():
 
 
 def test_predecesors_pattern():
-    pass
+    dom = dhtmlparser.parseString(
+        """
+        <root>
+            <xex>
+                <x>content</x>
+            </xex>
+        </root>
+        """
+    )
+    dhtmlparser.makeDoubleLinked(dom)
+
+    x = dom.find("x")[0]
+
+    res = path_patterns.predecesors_pattern(x, dom)
+
+    assert res
+    assert len(res) == 1
+
+    assert isinstance(res[0], path_patterns.PathCall)
+
+    assert res[0].call_type == "match"
+    assert res[0].index == 0
+    assert res[0].params == [
+        ["root", None],
+        ["xex", None],
+        ["x", None],
+    ]
+
+
+def test_predecesors_pattern_shallow_root():
+    dom = dhtmlparser.parseString(
+        """
+        <root>
+            <x>content</x>
+        </root>
+        """
+    )
+    dhtmlparser.makeDoubleLinked(dom)
+
+    x = dom.find("x")[0]
+
+    res = path_patterns.predecesors_pattern(x, dom)
+
+    assert not res
