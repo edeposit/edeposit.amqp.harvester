@@ -102,6 +102,19 @@ def _match_elements(dom, matches):
 
 
 def _collect_paths(element):  #TODO: test
+    """
+    Collect all possible path which leads to `element`.
+
+    Function returns standard path from root element to this, reverse path,
+    which uses negative indexes for path, also some pattern matches, like
+    "this is element, which has neighbour with id 7" and so on.
+
+    Args:
+        element (obj): HTMLElement instance.
+
+    Returns:
+        list: List of :class:`.PathCall` and :class:`.Chained` objects.
+    """
     output = []
 
     # look for element by parameters - sometimes the ID is unique
@@ -182,11 +195,11 @@ def _is_working_path(dom, path, element):  #TODO: test
 
     Args:
         dom (obj): HTMLElement DOM.
-        path (obj): :class:`PathCall` Instance containing informations about
+        path (obj): :class:`.PathCall` Instance containing informations about
                     path and which function it require to obtain element the
                     path is pointing to.
-        element (obj): HTMLElement instance used to decide whether `path` points
-                       to correct `element` or not.
+        element (obj): HTMLElement instance used to decide whether `path`
+                       points to correct `element` or not.
 
     Returns:
         bool: True if `path` correctly points to proper `element`.
@@ -266,10 +279,6 @@ def select_best_paths(examples):  #TODO: test
         for key, match in matching_elements.items():
             if key not in possible_paths:  # TODO: merge paths together?
                 possible_paths[key] = _collect_paths(match)
-
-    print map(lambda x: str(x), possible_paths["second"])
-    print len(possible_paths["second"])
-    print "---"
 
     # leave only paths, that works in all examples where, are required
     for example in examples:
