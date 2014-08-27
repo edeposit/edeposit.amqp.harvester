@@ -130,32 +130,30 @@ def content_matchs(tag_content, content_transformer=None):
     return content_matchs_closure
 
 
+def is_equal_tag(element, tag_name, params, content):
+    if tag_name and tag_name != element.getTagName():
+        return False
+
+    if params and not element.containsParamSubset(params):
+        return False
+
+    if content is not None and content.strip() != element.getContent().strip():
+        return False
+
+    return True
+
+
 def has_neigh(tag_name, params=None, content=None, left=True):
-    def neigh_match(element):
-        if tag_name and tag_name != element.getTagName():
-            return False
-
-        if params and element.containsParamSubset(params):
-            return False
-
-        if content and content.strip() != element.getContent().strip():
-            return False
-
-        return True
-
     def has_neigh_closure(element):
-        if not element.parent:
+        if not element.parent \
+           or not (element.isTag() and not element.isEndTag()):
             return False
-
-        # childs = []
-        # if not (tag_name and params):
-        childs = element.parent.childs
-        # else:
-            # childs = filter(lambda x: x.isTag(), element.parent.childs)
 
         # filter only visible tags/neighbours
+        childs = element.parent.childs
         childs = filter(
-            lambda x: x.isTag() or x.getContent().strip() or x is element,
+            lambda x: (x.isTag() and not x.isEndTag()) \
+                      or x.getContent().strip() or x is element,
             childs
         )
         if len(childs) <= 1:
@@ -163,9 +161,10 @@ def has_neigh(tag_name, params=None, content=None, left=True):
 
         ioe = childs.index(element)
         if left and ioe > 0:
-            return neigh_match(childs[ioe - 1])
-        elif not left and ioe + 1 < len(childs):
-            return neigh_match(childs[ioe + 1])
+            return is_equal_tag(childs[ioe - 1], tag_name, params, content)
+        
+        if not left and ioe + 1 < len(childs):
+            return is_equal_tag(childs[ioe + 1], tag_name, params, content)
 
         return False
 

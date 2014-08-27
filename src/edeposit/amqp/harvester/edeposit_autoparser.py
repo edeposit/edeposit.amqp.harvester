@@ -190,16 +190,24 @@ def _is_working_path(dom, path, element):  #TODO: test
             i_or_none(el.wfind(*params).childs, index),
         "match": lambda el, index, params:
             i_or_none(el.match(*params), index),
-        "left_neighbour_tag": lambda el, index, params:
+        "left_neighbour_tag": lambda el, index, neigh_data:
             i_or_none(
-                el.find(None, None, fn=utils.has_neigh(*params, left=True)),
+                el.find(
+                    neigh_data.tag_name,
+                    neigh_data.params,
+                    fn=utils.has_neigh(neigh_data.fn_params, left=True)
+                ),
                 index
             ),
-        "right_neighbour_tag": lambda el, index, params:
+        "right_neighbour_tag": lambda el, index, neigh_data:
             i_or_none(
-                el.find(None, None, fn=utils.has_neigh(*params, left=False)),
+                el.find(
+                    neigh_data.tag_name,
+                    neigh_data.params,
+                    fn=utils.has_neigh(neigh_data.fn_params, left=False)
+                ),
                 index
-            )
+            ),
     }
 
     el = None
