@@ -22,25 +22,20 @@ def _params_or_none(params):
     return params if params else None
 
 
+def _neighbour_to_path_call(neig_type, neighbour):
+    params = [None, None, neighbour.getContent().strip()]
+
+    if neighbour.isTag():
+        params = [
+            neighbour.getTagName(),
+            _params_or_none(neighbour.params),
+            neighbour.getContent().strip()
+        ]
+
+    return PathCall(neig_type + "_neighbour_tag", 0, params)
+
+
 def neighbours_pattern(element):  #TODO: test
-    def neighbour_to_path_call(neig_type, neighbour):
-        if neighbour.isTag():
-            return PathCall(
-                neig_type + "_neighbour_tag",
-                0,
-                [
-                    neighbour.getTagName(),
-                    _params_or_none(neighbour.params),
-                    neighbour.getContent().strip()
-                ]
-            )
-
-        return PathCall(
-            neig_type + "_neighbour_tag",
-            0,
-            [None, None, neighbour.getContent().strip()]
-        )
-
     # check if there are any neighbours
     if not element.parent or len(element.parent.childs) <= 1:
         return []
@@ -61,13 +56,13 @@ def neighbours_pattern(element):  #TODO: test
     # pick left neighbour
     if element_index >= 1:
         output.append(
-            neighbour_to_path_call("left", neighbours[element_index - 1])
+            _neighbour_to_path_call("left", neighbours[element_index - 1])
         )
 
     # pick right neighbour
     if element_index + 2 < len(neighbours):
         output.append(
-            neighbour_to_path_call("right", neighbours[element_index + 2])
+            _neighbour_to_path_call("right", neighbours[element_index + 2])
         )
 
     return output
