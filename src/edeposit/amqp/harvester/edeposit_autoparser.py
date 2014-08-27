@@ -176,13 +176,38 @@ def _collect_paths(element):  #TODO: test
 def _is_working_path(dom, path, element):  #TODO: test
     """
     Check whether the path is working or not.
+
+    Aply proper search function interpreting `path` to `dom` and check, if
+    returned object is `element`. If so, return ``True``, otherwise ``False``.
+
+    Args:
+        dom (obj): HTMLElement DOM.
+        path (obj): :class:`PathCall` Instance containing informations about
+                    path and which function it require to obtain element the
+                    path is pointing to.
+        element (obj): HTMLElement instance used to decide whether `path` points
+                       to correct `element` or not.
+
+    Returns:
+        bool: True if `path` correctly points to proper `element`.
     """
     def i_or_none(el, i):
+        """
+        Return ``el[i]`` if the list is not blank, or None otherwise.
+
+        Args:
+            el (list, tuple): Any indexable object.
+            i (int): Index.
+
+        Returns:
+            obj: Element at index `i` if `el` is not blank, or ``None``.
+        """
         if not el:
             return None
 
         return el[i]
 
+    # map decoders of all paths to one dictionary to make easier to call them
     path_functions = {
         "find": lambda el, index, params:
             i_or_none(el.find(*params), index),
@@ -195,7 +220,7 @@ def _is_working_path(dom, path, element):  #TODO: test
                 el.find(
                     neigh_data.tag_name,
                     neigh_data.params,
-                    fn=utils.has_neigh(neigh_data.fn_params, left=True)
+                    fn=utils.has_neigh(*neigh_data.fn_params, left=True)
                 ),
                 index
             ),
@@ -204,12 +229,13 @@ def _is_working_path(dom, path, element):  #TODO: test
                 el.find(
                     neigh_data.tag_name,
                     neigh_data.params,
-                    fn=utils.has_neigh(neigh_data.fn_params, left=False)
+                    fn=utils.has_neigh(*neigh_data.fn_params, left=False)
                 ),
                 index
             ),
     }
 
+    # call all decoders and see what you get from them
     el = None
     if isinstance(path, PathCall):
         el = path_functions[path.call_type](dom, path.index, path.params)
@@ -225,6 +251,7 @@ def _is_working_path(dom, path, element):  #TODO: test
     if not el:
         return False
 
+    # test whether returned item is the item we are looking for
     return el.getContent().strip() == element.getContent().strip()
 
 
