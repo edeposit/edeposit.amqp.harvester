@@ -53,6 +53,10 @@ def _process_config_item(item):  #TODO: test
     else:
         raise UserWarning("html: '%s' is neither URL or data!" % html)
 
+    for key, val in item.items():
+        if "notfoundmsg" in val:
+            val["notfoundmsg"] = val["notfoundmsg"].replace("$name", key)
+
     del item["html"]
     return {
         "html": html,
