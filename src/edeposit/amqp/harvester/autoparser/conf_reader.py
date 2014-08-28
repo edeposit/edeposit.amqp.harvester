@@ -23,7 +23,7 @@ def _get_source(link):
     raise UserWarning("html: '%s' is neither URL or data!" % link)
 
 
-def _process_config_item(item):  #TODO: test
+def _process_config_item(item, dirname):  #TODO: test
     """
     Process one item from the configuration file, which contains multiple items
     saved as dictionary.
@@ -57,7 +57,7 @@ def _process_config_item(item):  #TODO: test
         raise UserWarning("Can't find HTML source for item:\n%s" % str(item))
 
     # process HTML link
-    link = html
+    link = html if "://" in html else os.path.join(dirname, html)
     del item["html"]
 
     # replace $name with the actual name of the field
@@ -99,14 +99,16 @@ def read_config(file_name):  #TODO: test
         second:
             data: another wanted thing
     """
-    dirname = os.path.dirname(file_name)
+    dirname = os.path.dirname(
+        os.path.abspath(file_name)
+    )
+    dirname = os.path.relpath(dirname)
 
     config = []
     with open(file_name) as f:
-        os.chdir(dirname)
         for item in yaml.load_all(f.read()):
             config.append(
-                _process_config_item(item)
+                _process_config_item(item, dirname)
             )
 
     return config
