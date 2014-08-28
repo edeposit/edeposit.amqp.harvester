@@ -15,6 +15,7 @@ import autoparser.utils as utils
 import autoparser.conf_reader as conf_reader
 import autoparser.vectors as vectors
 import autoparser.path_patterns as path_patterns
+import autoparser.generator as generator
 from autoparser.path_patterns import PathCall, Chained
 
 
@@ -342,4 +343,5 @@ if __name__ == '__main__':
         sys.stderr.write("Configuration file '%s' is blank!\n" % args.config)
         sys.exit(1)
 
-    print select_best_paths(config)
+    paths = select_best_paths(config)
+    print generator.generate_parsers(config, paths)
