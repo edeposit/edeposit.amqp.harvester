@@ -162,7 +162,7 @@ def has_neigh(tag_name, params=None, content=None, left=True):
         ioe = childs.index(element)
         if left and ioe > 0:
             return is_equal_tag(childs[ioe - 1], tag_name, params, content)
-        
+
         if not left and ioe + 1 < len(childs):
             return is_equal_tag(childs[ioe + 1], tag_name, params, content)
 

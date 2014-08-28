@@ -4,7 +4,9 @@
 # Interpreter version: python 2.7
 #
 # Imports =====================================================================
+import inspect
 
+import utils
 
 
 # Variables ===================================================================
@@ -41,6 +43,7 @@ def _required_idiom(index, notfoundmsg):
     return output + IND + "el = el[%d]\n\n" % index
 
 
+# parser template generators ##################################################
 def _find_template(parameters, index, required=False, notfoundmsg=None):
     output = IND + "el = dom.find(%s)\n\n" % repr(parameters)[1:-1]
 
@@ -70,8 +73,34 @@ def _match_template(parameters, index, required=False, notfoundmsg=None):
     return output + _index_idiom("el", index)
 
 
+def _neigh_template(parameters, index, left=True, required=False,
+                                                  notfoundmsg=None):
+    fn_string = "has_neigh(%s, left=%s)" % (
+        repr(parameters.fn_params)[1:-1],
+        repr(left)
+    )
+
+    output = IND + "el = dom.find(\n"
+    output += IND + IND + "%s,\n" % repr(parameters.tag_name)
+
+    if parameters.params:
+        output += IND + IND + "%s,\n" % repr(parameters.params)
+
+    output += IND + IND + "fn=%s\n" % fn_string
+    output += IND + ")\n\n"
+
+    if required:
+        return output + _required_idiom(index, notfoundmsg)
+
+    return output + _index_idiom("el", index)
+
+# /parser template generators #################################################
+
+
 def _generate_parser(name, path, required=False, notfoundmsg=None):
     output = "def get_%s(dom):\n" % name
+
+    print path
 
     parser_table = {
         "find": lambda path:
@@ -80,6 +109,22 @@ def _generate_parser(name, path, required=False, notfoundmsg=None):
             _wfind_template(path.params, path.index, required, notfoundmsg),
         "match": lambda path:
             _match_template(path.params, path.index, required, notfoundmsg),
+        "left_neighbour_tag": lambda path:
+            _neigh_template(
+                path.params,
+                path.index,
+                True,
+                required,
+                notfoundmsg
+            ),
+        "right_neighbour_tag": lambda path:
+            _neigh_template(
+                path.params,
+                path.index,
+                False,
+                required,
+                notfoundmsg
+            ),
     }
     if path.call_type not in parser_table: #TODO: chained
         return ""
@@ -93,10 +138,23 @@ def _generate_parser(name, path, required=False, notfoundmsg=None):
 
 
 def generate_parsers(config, paths):
-    output = ""
+    output = """#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+# Interpreter version: python 2.7
+#
+import dhtmlparser
+
+
+# ---
+"""
+    # add source of neighbour picking functions from utils.py
+    output += inspect.getsource(utils.is_equal_tag) + "\n"
+    output += inspect.getsource(utils.has_neigh)
+    output += "\n# ---\n\n"
 
     for name, path in paths.items():
-        path = path[0]  # pick path with highest priority
+        path = path[-1]  # pick path with highest priority
 
         required = config[0]["vars"][name].get("required", False)
         notfoundmsg = config[0]["vars"][name].get("notfoundmsg", "")
