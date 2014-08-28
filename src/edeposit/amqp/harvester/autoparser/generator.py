@@ -7,6 +7,7 @@
 import inspect
 
 import utils
+import conf_reader
 import path_patterns
 
 
@@ -98,8 +99,12 @@ def _neigh_template(parameters, index, left=True, required=False,
 # /parser template generators #################################################
 
 
+def _get_parser_name(var_name):
+    return "get_%s" % var_name
+
+
 def _generate_parser(name, path, required=False, notfoundmsg=None):
-    output = "def get_%s(dom):\n" % name
+    output = "def %s(dom):\n" % _get_parser_name(name)
 
     print path
 
@@ -144,21 +149,46 @@ def _generate_parser(name, path, required=False, notfoundmsg=None):
     return output
 
 
+def _unittest_template(config):
+    output = "def test_parsers():\n"
+
+    links = dict(map(lambda x: (x["link"], x["vars"]), config))
+
+    for link in links.keys():
+        output += IND + "# Test parsers against %s\n" % link
+        output += IND + "html = handle_encodnig(_get_source(%s))\n" % repr(link)
+        output += IND + "dom = dhtmlparser.parseString(html)\n\n"
+
+        for var in links[link]:
+            output += IND + "%s = %s(dom)\n" % (var, _get_parser_name(var))
+            output += IND + "assert %s.getContent().strip() == %s.strip()" % (
+                var,
+                repr(links[link][var]["data"])
+            )
+            output += "\n\n"
+
+    return output
+
+
 def generate_parsers(config, paths):
     output = """#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 # Interpreter version: python 2.7
 #
+import httpkie
 import dhtmlparser
 
 
-# ---
+# Utilities
 """
     # add source of neighbour picking functions from utils.py
+    output += inspect.getsource(conf_reader._get_source) + "\n"
+    output += inspect.getsource(utils._get_encoding) + "\n"
+    output += inspect.getsource(utils.handle_encodnig) + "\n"
     output += inspect.getsource(utils.is_equal_tag) + "\n"
-    output += inspect.getsource(utils.has_neigh)
-    output += "\n# ---\n\n"
+    output += inspect.getsource(utils.has_neigh) + "\n"
+    output += "\n# Generated parsers\n\n"
 
     for name, path in paths.items():
         path = path[-1]  # pick path with highest priority
@@ -167,5 +197,8 @@ import dhtmlparser
         notfoundmsg = config[0]["vars"][name].get("notfoundmsg", "")
 
         output += _generate_parser(name, path, required, notfoundmsg)
+
+    output += "\n# Unittest\n\n"
+    output += _unittest_template(config)
 
     return output

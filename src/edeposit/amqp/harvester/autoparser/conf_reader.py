@@ -11,6 +11,18 @@ import httpkie
 
 
 # Functions & objects =========================================================
+def _get_source(link):
+    if link.startswith("http://") or link.startswith("https://"):
+        down = httpkie.Downloader()
+        return down.download(link)
+
+    if os.path.exists(link):
+        with open(link) as f:
+            return f.read()
+
+    raise UserWarning("html: '%s' is neither URL or data!" % link)
+
+
 def _process_config_item(item):  #TODO: test
     """
     Process one item from the configuration file, which contains multiple items
@@ -26,6 +38,7 @@ def _process_config_item(item):  #TODO: test
     Note:
         Returned data format::
             {
+                "link": "link to html page/file",
                 "html": "html code from file/url",
                 "vars": {
                     "varname": {
@@ -44,22 +57,17 @@ def _process_config_item(item):  #TODO: test
         raise UserWarning("Can't find HTML source for item:\n%s" % str(item))
 
     # process HTML link
-    if html.startswith("http://") or html.startswith("https://"):
-        down = httpkie.Downloader()
-        html = down.download(html)
-    elif os.path.exists(html):
-        with open(html) as f:
-            html = f.read()
-    else:
-        raise UserWarning("html: '%s' is neither URL or data!" % html)
+    link = html
+    del item["html"]
 
+    # replace $name with the actual name of the field
     for key, val in item.items():
         if "notfoundmsg" in val:
             val["notfoundmsg"] = val["notfoundmsg"].replace("$name", key)
 
-    del item["html"]
     return {
-        "html": html,
+        "html": _get_source(link),
+        "link": link,
         "vars": item
     }
 
