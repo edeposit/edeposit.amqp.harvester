@@ -256,6 +256,8 @@ def _is_working_path(dom, path, element):  #TODO: test
     elif isinstance(path, Chained):
         for path in path.chain:
             dom = path_functions[path.call_type](dom, path.index, path.params)
+            if not dom:
+                return False
         el = dom
     else:
         raise UserWarning(
