@@ -7,6 +7,7 @@
 import inspect
 
 import utils
+import path_patterns
 
 
 # Variables ===================================================================
@@ -126,10 +127,16 @@ def _generate_parser(name, path, required=False, notfoundmsg=None):
                 notfoundmsg
             ),
     }
-    if path.call_type not in parser_table: #TODO: chained
-        return ""
 
-    output += parser_table[path.call_type](path)
+    if isinstance(path, path_patterns.PathCall):
+        output += parser_table[path.call_type](path)
+    elif isinstance(path, path_patterns.Chained):
+        for path in path.chain:
+            output += parser_table[path.call_type](path)
+    else:
+        raise UserWarning(
+            "Unknown type of path parameters! (%s)" % str(path)
+        )
 
     output += IND + "return el\n"
     output += "\n"
