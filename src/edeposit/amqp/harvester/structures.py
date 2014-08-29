@@ -221,3 +221,12 @@ class Publication(object):
                 return False
 
         return True
+
+class Publications(namedtuple("Publication", ["publications"])):
+    """
+    AMQP communication structured used to hold the transfered informations.
+
+    Attributes:
+        publications (list): List of :class:`Publication` namedtuples.
+    """
+    pass
