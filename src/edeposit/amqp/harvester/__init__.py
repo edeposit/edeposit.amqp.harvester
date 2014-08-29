@@ -33,13 +33,15 @@ def get_all_publications(return_namedtuples=True):
     # get data from all scrappers
     publications = []
     for source in sources:
-        publications.extend(source())
+        publications.extend(
+            filters.filter_publications(source())
+        )
 
     # convert to namedtuples
     if return_namedtuples:
-        publications = map(lambda x: x.to_namedtuple, publications)
+        publications = map(lambda x: x.to_namedtuple(), publications)
 
-    return filters.filter_publications(publications)
+    return publications
 
 
 def self_test():
