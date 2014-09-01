@@ -1,7 +1,6 @@
-harvester.filters.aleph_filter module
-=====================================
+Aleph filter
+============
 
 .. automodule:: harvester.filters.aleph_filter
     :members:
     :undoc-members:
-    :show-inheritance:

@@ -81,7 +81,7 @@ def filter_publication(publication, cmp_authors=True):
     Filter publications based at data from Aleph.
 
     Args:
-        publication (obj): :class:`structures.Publication` instance.
+        publication (obj): :class:`.Publication` instance.
 
     Returns:
         obj/None: None if the publication was found in Aleph or `publication` \

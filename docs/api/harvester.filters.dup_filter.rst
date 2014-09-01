@@ -1,7 +1,6 @@
-harvester.filters.dup_filter module
-===================================
+Duplication filter
+==================
 
 .. automodule:: harvester.filters.dup_filter
     :members:
     :undoc-members:
-    :show-inheritance:

@@ -18,10 +18,10 @@ from .. import settings
 def filter_publication(publication):
     """
     Filter :class:`.Publication` objects using settings declared in
-    :mod:`settings` submodule.
+    :mod:`~harvester.settings` submodule.
 
     Args:
-        publication (obj): :class:`structures.Publication` instance.
+        publication (obj): :class:`.Publication` instance.
 
     Returns:
         obj/None: None if the publication was found in Aleph or `publication` \
@@ -41,10 +41,10 @@ def filter_publication(publication):
 
 def filter_publications(publications):
     """
-    Filter list of :class:`Publication` objects.
+    Filter list of :class:`.Publication` objects.
 
     Args:
-        publications (list): List of :class:`Publication` instances.
+        publications (list): List of :class:`.Publication` instances.
 
     Returns:
         list: Correct objects.

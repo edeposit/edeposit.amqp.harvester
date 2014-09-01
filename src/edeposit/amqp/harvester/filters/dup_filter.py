@@ -12,7 +12,7 @@ called with same parameter again, None is retuned.
 Note:
     Cache is using simple JSON serialization, so some form of cache persistency
     is granted. For path to the serialized data, look at
-    :attr:`settings.DUP_FILTER_FILE`.
+    :attr:`~harvester.settings.DUP_FILTER_FILE`.
 """
 # Imports =====================================================================
 import json
@@ -61,7 +61,7 @@ def filter_publication(publication, cache=_CACHE):
     `cache`. If the match NOT is found, `publication` is returned, else None.
 
     Args:
-        publication (obj): :class:`structures.Publication` instance.
+        publication (obj): :class:`.Publication` instance.
         cache (obj): Cache which is used for lookups.
 
     Returns:
