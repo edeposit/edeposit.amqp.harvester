@@ -3,8 +3,12 @@
 #
 # Interpreter version: python 2.7
 #
+"""
+Functions which allows to read serialized informations for autoparser.
+"""
 # Imports =====================================================================
 import os.path
+import copy
 
 import yaml
 import httpkie
@@ -12,6 +16,18 @@ import httpkie
 
 # Functions & objects =========================================================
 def _get_source(link):
+    """
+    Return source of the `link` whether it is filename or url.
+
+    Args:
+        link (str): Filename or URL.
+
+    Returns:
+        str: Content.
+
+    Raises:
+        UserWarning: When the `link` couldn't be resolved.
+    """
     if link.startswith("http://") or link.startswith("https://"):
         down = httpkie.Downloader()
         return down.download(link)
@@ -23,7 +39,7 @@ def _get_source(link):
     raise UserWarning("html: '%s' is neither URL or data!" % link)
 
 
-def _process_config_item(item, dirname):  #TODO: test
+def _process_config_item(item, dirname):
     """
     Process one item from the configuration file, which contains multiple items
     saved as dictionary.
@@ -51,6 +67,7 @@ def _process_config_item(item, dirname):  #TODO: test
     Returns:
         dict: Dictionary in format showed above.
     """
+    item = copy.deepcopy(item)
     html = item.get("html", None)
 
     if not html:
@@ -72,7 +89,7 @@ def _process_config_item(item, dirname):  #TODO: test
     }
 
 
-def read_config(file_name):  #TODO: test
+def read_config(file_name):
     """
     Read YAML file with configuration and pointers to example data.
 
