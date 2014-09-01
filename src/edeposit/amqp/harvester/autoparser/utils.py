@@ -4,7 +4,8 @@
 # Interpreter version: python 2.7
 #
 """
-Utilities used in scrappers.
+This module contains number of functions, which are used at multiple places in
+autoparser.
 """
 # Imports =====================================================================
 import dhtmlparser
@@ -58,52 +59,6 @@ def handle_encodnig(html):
     return html.decode(encoding).encode("utf-8")
 
 
-def has_param(param):
-    """
-    Generate function, which will check `param` is in html element.
-
-    This function can be used as parameter for .find() method in HTMLElement.
-    """
-    def has_param_closure(element):
-        """
-        Look for `param` in `element`.
-        """
-        if element.params.get(param, "").strip():
-            return True
-
-        return False
-
-    return has_param_closure
-
-
-def must_contain(tag_name, tag_content, container_tag_name):
-    """
-    Generate function, which checks if given element contains `tag_name` with
-    string content `tag_content` and also another tag named
-    `container_tag_name`.
-
-    This function can be used as parameter for .find() method in HTMLElement.
-    """
-    def must_contain_closure(element):
-        # containing in first level of childs <tag_name> tag
-        matching_tags = element.match(tag_name, absolute=True)
-        if not matching_tags:
-            return False
-
-        # which's content match `tag_content`
-        if matching_tags[0].getContent() != tag_content:
-            return False
-
-        # and also contains <container_tag_name> tag
-        if container_tag_name and \
-           not element.match(container_tag_name, absolute=True):
-            return False
-
-        return True
-
-    return must_contain_closure
-
-
 def content_matchs(tag_content, content_transformer=None):
     """
     Generate function, which checks whether the content of the tag matchs
@@ -115,7 +70,12 @@ def content_matchs(tag_content, content_transformer=None):
         content_transformer (fn, default None): Function used to transform all
                             tags before matching.
 
-    This function can be used as parameter for .find() method in HTMLElement.
+    Returns:
+        bool: True for every matching tag.
+
+    Note:
+        This function can be used as parameter for ``.find()`` method in
+        HTMLElement.
     """
     def content_matchs_closure(element):
         if not element.isTag():
@@ -131,6 +91,20 @@ def content_matchs(tag_content, content_transformer=None):
 
 
 def is_equal_tag(element, tag_name, params, content):
+    """
+    Check is `element` object match rest of the parameters.
+
+    All checks are performed only if proper attribute is set in the HTMLElement.
+
+    Args:
+        element (obj): HTMLElement instance.
+        tag_name (str): Tag name.
+        params (dict): Parameters of the tag.
+        content (str): Content of the tag.
+
+    Returns:
+        bool: True if everyhing matchs, False otherwise.
+    """
     if tag_name and tag_name != element.getTagName():
         return False
 
@@ -144,6 +118,24 @@ def is_equal_tag(element, tag_name, params, content):
 
 
 def has_neigh(tag_name, params=None, content=None, left=True):
+    """
+    This function generates functions, which matches all tags with neighbours
+    defined by parameters.
+
+    Args:
+        tag_name (str): Tag has to have neighbour with this tagname.
+        params (dict): Tag has to have neighbour with this parameters.
+        params (str): Tag has to have neighbour with this content.
+        left (bool, default True): Tag has to have neigbour on the left, or
+                                   right (set to ``False``).
+
+    Returns:
+        bool: True for every matching tag.
+
+    Note:
+        This function can be used as parameter for ``.find()`` method in
+        HTMLElement.
+    """
     def has_neigh_closure(element):
         if not element.parent \
            or not (element.isTag() and not element.isEndTag()):

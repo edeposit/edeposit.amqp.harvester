@@ -1,7 +1,6 @@
-harvester.autoparser.utils module
-=================================
+utils submodule
+===============
 
 .. automodule:: harvester.autoparser.utils
     :members:
     :undoc-members:
-    :show-inheritance:
