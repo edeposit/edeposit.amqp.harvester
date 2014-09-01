@@ -1,7 +1,6 @@
-harvester.autoparser.vectors module
-===================================
+vectors submodule
+=================
 
 .. automodule:: harvester.autoparser.vectors
     :members:
     :undoc-members:
-    :show-inheritance:

@@ -70,10 +70,10 @@ new parsers easier.
     :maxdepth: 1
 
     /api/harvester.autoparser.conf_reader
-    /api/harvester.autoparser.generator
+    /api/harvester.autoparser.vectors
     /api/harvester.autoparser.path_patterns
     /api/harvester.autoparser.utils
-    /api/harvester.autoparser.vectors
+    /api/harvester.autoparser.generator
 
 AMQP connection
 ---------------

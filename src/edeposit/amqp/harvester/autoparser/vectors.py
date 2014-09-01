@@ -3,6 +3,10 @@
 #
 # Interpreter version: python 2.7
 #
+"""
+This module contains functions to convert `DOM` relations to `path-like` lists
+of elements defined by tag names and parameters.
+"""
 # Imports =====================================================================
 
 
@@ -72,6 +76,8 @@ def find_common_root(elements):
         root_path = common_vector_root(root_path, el_path)
 
         if not root_path:
-            raise UserWarning("Vectors without common root:\n%s" % str(el_path))
+            raise UserWarning(
+                "Vectors without common root:\n%s" % str(el_path)
+            )
 
     return root_path
