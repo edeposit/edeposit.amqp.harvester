@@ -3,6 +3,9 @@
 #
 # Interpreter version: python 2.7
 #
+"""
+This module is used to download metadata from `grada.cz`.
+"""
 # Imports =====================================================================
 import httpkie
 import dhtmlparser
@@ -238,10 +241,10 @@ def _process_book(html_chunk):
 
 def get_publications():
     """
-    Get list of publication offered by ben.cz.
+    Get list of publication offered by grada.cz.
 
     Returns:
-        list: List of :class:`structures.Publication` objects.
+        list: List of :class:`.Publication` objects.
     """
     data = DOWNER.download(URL)
     dom = dhtmlparser.parseString(

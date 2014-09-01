@@ -4,9 +4,7 @@
 # Interpreter version: python 2.7
 #
 """
-ben.cz scrapper.
-
-This module downloads last 100 books published by ben.cz.
+This module is used to download last 100 books published by `ben.cz`.
 """
 # Imports =====================================================================
 import httpkie
@@ -19,7 +17,7 @@ from ..structures import Publication
 
 
 # Variables ===================================================================
-URL = "http://shop.ben.cz/"
+URL = "http://shop.ben.cz/"  #: Base url of the eshop.
 URL += r"Produkty.aspx?lang=cz&nak=BEN+-+technick%u00e1+literatura"
 DOWNER = httpkie.Downloader()
 DOWNER.cookies = {

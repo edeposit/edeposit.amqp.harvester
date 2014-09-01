@@ -1,5 +1,5 @@
-harvester.scrappers.grada_cz module
-===================================
+grada.cz scrapper
+=================
 
 .. automodule:: harvester.scrappers.grada_cz
     :members:

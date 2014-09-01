@@ -14,7 +14,7 @@ Scripts
 
 API
 ---
-Whole module is divided into three parts:
+Whole module is divided into following parts:
 
 Scrappers
 +++++++++

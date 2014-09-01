@@ -1,5 +1,5 @@
-harvester.scrappers.cpress_cz module
-====================================
+cpress.cz scrapper
+==================
 
 .. automodule:: harvester.scrappers.cpress_cz
     :members:
