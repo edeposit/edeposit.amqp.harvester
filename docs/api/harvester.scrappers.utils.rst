@@ -1,7 +1,7 @@
-harvester.scrappers.structures module
+harvester.scrappers.utils module
 =====================================
 
-.. automodule:: harvester.scrappers.structures
+.. automodule:: harvester.scrappers.utils
     :members:
     :undoc-members:
     :show-inheritance:

@@ -30,6 +30,11 @@ publisher's webpages.
     /api/harvester.scrappers.grada_cz
     /api/harvester.scrappers.zonerpress_cz
 
+.. toctree::
+    :maxdepth: 1
+
+    /api/harvester.scrappers.utils
+
 Filters
 +++++++
 

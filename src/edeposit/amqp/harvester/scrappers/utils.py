@@ -4,7 +4,8 @@
 # Interpreter version: python 2.7
 #
 """
-Utilities used in scrappers.
+This module contains number of functions, which are used in the rest of the
+scrappers submodule.
 """
 # Imports =====================================================================
 import dhtmlparser
