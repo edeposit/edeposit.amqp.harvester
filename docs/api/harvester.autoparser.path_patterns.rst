@@ -1,7 +1,6 @@
-harvester.autoparser.path_patterns module
-=========================================
+path_patterns submodule
+=======================
 
 .. automodule:: harvester.autoparser.path_patterns
     :members:
     :undoc-members:
-    :show-inheritance:

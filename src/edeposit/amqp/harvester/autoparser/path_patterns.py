@@ -164,7 +164,7 @@ def predecesors_pattern(element, root):
         root (obj): Root of the `DOM`.
 
     Returns:
-        list: ``[PathCall()]` - list with one :class:`PathCall` object (to
+        list: ``[PathCall()]`` - list with one :class:`PathCall` object (to \
               allow use with ``.extend(predecesors_pattern())``).
     """
     def is_root_container(el):
