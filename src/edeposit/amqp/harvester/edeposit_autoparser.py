@@ -102,7 +102,7 @@ def _match_elements(dom, matches):
     return out
 
 
-def _collect_paths(element):  #TODO: test
+def _collect_paths(element):
     """
     Collect all possible path which leads to `element`.
 
@@ -187,7 +187,7 @@ def _collect_paths(element):  #TODO: test
     return output
 
 
-def _is_working_path(dom, path, element):  #TODO: test
+def _is_working_path(dom, path, element):
     """
     Check whether the path is working or not.
 
@@ -271,7 +271,17 @@ def _is_working_path(dom, path, element):  #TODO: test
     return el.getContent().strip() == element.getContent().strip()
 
 
-def select_best_paths(examples):  #TODO: test
+def select_best_paths(examples):
+    """
+    Process `examples`, select only paths that works for every example. Select
+    best paths with highest priority.
+
+    Args:
+        examples (dict): Output from :func:`.read_config`.
+
+    Returns:
+        list: List of :class:`.PathCall` and :class:`.Chained` objects.
+    """
     possible_paths = {}  # {varname: [paths]}
 
     # collect list of all possible paths to all existing variables
