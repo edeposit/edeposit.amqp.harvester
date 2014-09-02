@@ -18,7 +18,7 @@ EXAMPLE_DATA = """
         <sometag>something something</sometag>
         <xax>
             something something
-            <container>i wan't this</container>
+            <container>i want this</container>
         </xax>
         <sometag>something something</sometag>
         <container id="mycontent">and this</container>
@@ -84,7 +84,7 @@ def test_match_elements():
     dom = autoparser._create_dom(EXAMPLE_DATA)
     matches = {
         "first": {
-            "data": "i wan't this",
+            "data": "i want this",
         },
         "second": {
             "data": "and this",
@@ -138,3 +138,43 @@ def test_match_elements_multiple_matches():
 
     with pytest.raises(UserWarning):
         autoparser._match_elements(dom, matches)
+
+
+def test_collect_paths():
+    dom = autoparser._create_dom(EXAMPLE_DATA)
+
+    el = dom.find("container")[0]
+    paths = autoparser._collect_paths(el)
+
+    assert paths
+    assert len(paths) > 5
+
+
+def test_is_working_path():
+    dom = autoparser._create_dom(EXAMPLE_DATA)
+
+    el = dom.find("container")[0]
+    paths = autoparser._collect_paths(el)
+
+    for path in paths:
+        assert autoparser._is_working_path(dom, path, el)
+
+
+def test_select_best_paths():
+    source = [{
+        'html': EXAMPLE_DATA,
+        "vars": {
+            'first': {
+                'required': True,
+                'data': "i want this",
+                'notfoundmsg': "Can't find variable '$name'."
+            },
+            'second': {
+                'data': 'and this'
+            },
+        }
+    }]
+    working = autoparser.select_best_paths(source)
+
+    assert working
+    assert len(working) >= 2
