@@ -1,7 +1,7 @@
-harvester.autoparser.generator module
-=====================================
+generator submodule
+===================
 
 .. automodule:: harvester.autoparser.generator
     :members:
     :undoc-members:
-    :show-inheritance:
+    :private-members:
