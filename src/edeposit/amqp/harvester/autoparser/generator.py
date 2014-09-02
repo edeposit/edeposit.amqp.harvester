@@ -3,6 +3,10 @@
 #
 # Interpreter version: python 2.7
 #
+"""
+This module contains number of template generators, which generates all the
+python code for the parser.
+"""
 # Imports =====================================================================
 import inspect
 
@@ -34,14 +38,9 @@ def _index_idiom(el_name, index, alt=None):
         >>> print g._index_idiom("xex", 0)
             # pick element from list
             xex = xex[0] if xex else None
-
-
         >>> print g._index_idiom("xex", 1, "something")
         # pick element from list
         xex = xex[1] if len(xex) - 1 >= 1 else 'something'
-
-
-        >>>
     """
     el_index = "%s[%d]" % (el_name, index)
 
@@ -67,37 +66,11 @@ def _required_idiom(tag_name, index, notfoundmsg):
     Args:
         tag_name (str): Name of the container.
         index (int): Index of the item you want to obtain from container.
-        notfoundmsg (str): Raise :py:class:`UserWarning` with debug data and
+        notfoundmsg (str): Raise :class:`.UserWarning` with debug data and
                            following message.
 
     Returns:
         str: Python code.
-
-    Live example::
-        >>> import generator as g
-        >>> print g._required_idiom("xex", 0, "Not found!")
-            if not el:
-                raise UserWarning(
-                    'Not found!\n' +
-                    'Tag name: xex\n' +
-                    'El:' + str(el) + '\n' +
-                    'Dom:' + str(dom)
-                )
-
-            el = el[0]
-        >>> print g._required_idiom("xex", 2, "Not found!")
-            if not el or len(el) - 1 < 2:
-                raise UserWarning(
-                    'Not found!\n' +
-                    'Tag name: xex\n' +
-                    'El:' + str(el) + '\n' +
-                    'Dom:' + str(dom)
-                )
-
-            el = el[2]
-
-
-        >>>
     """
     cond = ""
     if index > 0:
@@ -129,6 +102,12 @@ def _find_template(parameters, index, required=False, notfoundmsg=None):
 
     Returns:
         str: Python code.
+
+    Live example::
+        >>> print g._find_template(["<xex>"], 3)
+            el = dom.find('<xex>')
+            # pick element from list
+            el = el[3] if len(el) - 1 >= 3 else None
     """
     output = IND + "el = dom.find(%s)\n\n" % repr(parameters)[1:-1]
 
@@ -138,8 +117,30 @@ def _find_template(parameters, index, required=False, notfoundmsg=None):
     return output + _index_idiom("el", index)
 
 
-def _wfind_template(dom, parameters, index, required=False, notfoundmsg=None):
-    tag_name = "dom" if dom else "el"
+def _wfind_template(use_dom, parameters, index, required=False,
+                                                notfoundmsg=None):
+    """
+    Generate ``.wfind()`` call for HTMLElement.
+
+    Args:
+        use_dom (bool): Use ``dom`` as tag name. If ``False``, ``el`` is used.
+        parameters (list): List of parameters for ``.wfind()``.
+        index (int): Index of the item you want to get from ``.wfind()`` call.
+        required (bool, default False): Use :func:`_required_idiom` to returned
+                 data.
+        notfoundmsg (str, default None): Message which will be used for
+                    :func:`_required_idiom` if the item is not found.
+
+    Returns:
+        str: Python code.
+
+    Live example::
+        >>> print g._wfind_template(True, ["<xex>"], 3)
+            el = dom.wfind('<xex>').childs
+            # pick element from list
+            el = el[3] if len(el) - 1 >= 3 else None
+    """
+    tag_name = "dom" if use_dom else "el"
     output = IND + "el = %s.wfind(%s).childs\n\n" % (
         tag_name,
         repr(parameters)[1:-1]
@@ -152,6 +153,26 @@ def _wfind_template(dom, parameters, index, required=False, notfoundmsg=None):
 
 
 def _match_template(parameters, index, required=False, notfoundmsg=None):
+    """
+    Generate ``.match()`` call for HTMLElement.
+
+    Args:
+        parameters (list): List of parameters for ``.match()``.
+        index (int): Index of the item you want to get from ``.match()`` call.
+        required (bool, default False): Use :func:`_required_idiom` to returned
+                 data.
+        notfoundmsg (str, default None): Message which will be used for
+                    :func:`_required_idiom` if the item is not found.
+
+    Returns:
+        str: Python code.
+
+    Live example::
+        >>> print g._match_template(["<xex>"], 3)
+            el = dom.match('<xex>')
+            # pick element from list
+            el = el[3] if len(el) - 1 >= 3 else None
+    """
     output = IND + "el = dom.match(%s)\n\n" % repr(parameters)[1:-1]
 
     #TODO: reduce None parameters
@@ -164,6 +185,22 @@ def _match_template(parameters, index, required=False, notfoundmsg=None):
 
 def _neigh_template(parameters, index, left=True, required=False,
                                                   notfoundmsg=None):
+    """
+    Generate neighbour matching call for HTMLElement, which returns only
+    elements with required neighbours.
+
+    Args:
+        parameters (list): List of parameters for ``.match()``.
+        index (int): Index of the item you want to get from ``.match()`` call.
+        left (bool, default True): Look for neigbour in the left side of el.
+        required (bool, default False): Use :func:`_required_idiom` to returned
+                 data.
+        notfoundmsg (str, default None): Message which will be used for
+                    :func:`_required_idiom` if the item is not found.
+
+    Returns:
+        str: Python code.
+    """
     fn_string = "has_neigh(%s, left=%s)" % (
         repr(parameters.fn_params)[1:-1],
         repr(left)
@@ -187,10 +224,34 @@ def _neigh_template(parameters, index, left=True, required=False,
 
 
 def _get_parser_name(var_name):
+    """
+    Parser name composer.
+
+    Args:
+        var_name (str): Name of the variable.
+
+    Returns:
+        str: Parser function name.
+    """
     return "get_%s" % var_name
 
 
 def _generate_parser(name, path, required=False, notfoundmsg=None):
+    """
+    Generate parser named `name` for given `path`.
+
+    Args:
+        name (str): Basename for the parsing function (see
+                    :func:`_get_parser_name` for details).
+        path (obj): :class:`.PathCall` or :class:`.Chained` instance.
+        required (bool, default False): Use :func:`_required_idiom` to returned
+                 data.
+        notfoundmsg (str, default None): Message which will be used for
+                    :func:`_required_idiom` if the item is not found.
+
+    Returns:
+        str: Python code for parsing `path`.
+    """
     output = "def %s(dom):\n" % _get_parser_name(name)
 
     dom = True  # used specifically in _wfind_template
@@ -243,6 +304,16 @@ def _generate_parser(name, path, required=False, notfoundmsg=None):
 
 
 def _unittest_template(config):
+    """
+    Generate unittests for all of the generated code.
+
+    Args:
+        config (dict): Original configuration dictionary. See
+               :mod:`~harvester.autoparser.conf_reader` for details.
+
+    Returns:
+        str: Python code.
+    """
     output = "def test_parsers():\n"
 
     links = dict(map(lambda x: (x["link"], x["vars"]), config))
@@ -268,6 +339,18 @@ def _unittest_template(config):
 
 
 def generate_parsers(config, paths):
+    """
+    Generate parser for all `paths`.
+
+    Args:
+        config (dict): Original configuration dictionary used to get matches
+                       for unittests. See
+                       :mod:`~harvester.autoparser.conf_reader` for details.
+        paths (dict): Output from :func:`.select_best_paths`.
+
+    Returns:
+        str: Python code containing all parsers for `paths`.
+    """
     output = """#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 #
