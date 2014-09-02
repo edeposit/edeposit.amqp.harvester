@@ -222,6 +222,7 @@ class Publication(object):
 
         return True
 
+
 class Publications(namedtuple("Publication", ["publications"])):
     """
     AMQP communication structured used to hold the transfered informations.
