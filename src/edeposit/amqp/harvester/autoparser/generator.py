@@ -12,11 +12,37 @@ import path_patterns
 
 
 # Variables ===================================================================
-IND = "    "
+IND = "    "  #: Indentation.
 
 
 # Functions & objects =========================================================
 def _index_idiom(el_name, index, alt=None):
+    """
+    Generate string where `el_name` is indexed by `index` if there are enough
+    items or `alt` is returned.
+
+    Args:
+        el_name (str): Name of the `container` which is indexed.
+        index (int): Index of the item you want to obtain from container.
+        alt (whatever, default None): Alternative value.
+
+    Returns:
+        str: Python code.
+
+    Live example::
+        >>> import generator as g
+        >>> print g._index_idiom("xex", 0)
+            # pick element from list
+            xex = xex[0] if xex else None
+
+
+        >>> print g._index_idiom("xex", 1, "something")
+        # pick element from list
+        xex = xex[1] if len(xex) - 1 >= 1 else 'something'
+
+
+        >>>
+    """
     el_index = "%s[%d]" % (el_name, index)
 
     if index == 0:
@@ -35,6 +61,44 @@ def _index_idiom(el_name, index, alt=None):
 
 
 def _required_idiom(tag_name, index, notfoundmsg):
+    """
+    Generate code, which make sure that `tag_name` has enoug items.
+
+    Args:
+        tag_name (str): Name of the container.
+        index (int): Index of the item you want to obtain from container.
+        notfoundmsg (str): Raise :py:class:`UserWarning` with debug data and
+                           following message.
+
+    Returns:
+        str: Python code.
+
+    Live example::
+        >>> import generator as g
+        >>> print g._required_idiom("xex", 0, "Not found!")
+            if not el:
+                raise UserWarning(
+                    'Not found!\n' +
+                    'Tag name: xex\n' +
+                    'El:' + str(el) + '\n' +
+                    'Dom:' + str(dom)
+                )
+
+            el = el[0]
+        >>> print g._required_idiom("xex", 2, "Not found!")
+            if not el or len(el) - 1 < 2:
+                raise UserWarning(
+                    'Not found!\n' +
+                    'Tag name: xex\n' +
+                    'El:' + str(el) + '\n' +
+                    'Dom:' + str(dom)
+                )
+
+            el = el[2]
+
+
+        >>>
+    """
     cond = ""
     if index > 0:
         cond = " or len(el) - 1 < %d" % index
@@ -52,6 +116,20 @@ def _required_idiom(tag_name, index, notfoundmsg):
 
 # parser template generators ##################################################
 def _find_template(parameters, index, required=False, notfoundmsg=None):
+    """
+    Generate ``.find()`` call for HTMLElement.
+
+    Args:
+        parameters (list): List of parameters for ``.find()``.
+        index (int): Index of the item you want to get from ``.find()`` call.
+        required (bool, default False): Use :func:`_required_idiom` to returned
+                 data.
+        notfoundmsg (str, default None): Message which will be used for
+                    :func:`_required_idiom` if the item is not found.
+
+    Returns:
+        str: Python code.
+    """
     output = IND + "el = dom.find(%s)\n\n" % repr(parameters)[1:-1]
 
     if required:
