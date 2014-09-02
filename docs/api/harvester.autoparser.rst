@@ -1,6 +1,11 @@
 harvester.autoparser package
 ============================
 
+.. automodule:: harvester.autoparser
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 Submodules
 ----------
 
@@ -11,11 +16,3 @@ Submodules
    harvester.autoparser.path_patterns
    harvester.autoparser.utils
    harvester.autoparser.vectors
-
-Module contents
----------------
-
-.. automodule:: harvester.autoparser
-    :members:
-    :undoc-members:
-    :show-inheritance:
