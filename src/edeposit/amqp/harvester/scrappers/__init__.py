@@ -7,6 +7,7 @@
 import ben_cz
 import grada_cz
 import cpress_cz
+import zonerpress_cz
 
 
 # Functions & objects =========================================================
