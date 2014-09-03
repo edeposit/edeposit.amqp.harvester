@@ -1,0 +1,38 @@
+html: http://www.zonerpress.cz/ocima-fotografa-graficky-pruvodce
+title:
+    tagname: h2
+    data: "Očima fotografa: Grafický průvodce"
+    required: true
+price:
+    data: "360&nbsp;Kč"
+    required: true
+publisher:
+    tagname: td
+    data: Zoner Press
+    required: true
+---
+html: http://www.zonerpress.cz/e-kniha-vyvoj-univerzalnych-aplikacii-pre-windows-8-a-windows-phone-8.1
+title:
+    tagname: h2
+    data: "E-kniha: Vývoj univerzálnych aplikácií pre windows 8 a Windows Phone 8.1"
+    required: true
+price:
+    data: "199&nbsp;Kč"
+    required: true
+publisher:
+    tagname: td
+    data: Zoner Press
+    required: true
+---
+html: http://www.zonerpress.cz/konec-prokrastinace
+title:
+    tagname: h2
+    data: Konec prokrastinace
+    required: true
+price:
+    data: "349&nbsp;Kč"
+    required: true
+publisher:
+    tagname: td
+    data: Jan Melvil Publishing
+    required: true
