@@ -10,6 +10,23 @@ publisher:
     tagname: td
     data: Zoner Press
     required: true
+author:
+    tagname: td
+    data: |
+     Michael Freeman
+                        (<a href="http://www.zonerpress.cz/inshop/scripts/shop.aspx?action=DoSearch&limitedlevels=1&ParamID_1=Michael Freeman">Zobrazit všechny knihy tohoto autora</a>)
+pages:
+    tagname: td
+    data: "192"
+pub_date:
+    tagname: td
+    data: "2014"
+ISBN:
+    tagname: td
+    data: 978-80-7413-275-9
+binding:
+    tagname: td
+    data: Měkká s klopnami
 ---
 html: http://www.zonerpress.cz/e-kniha-vyvoj-univerzalnych-aplikacii-pre-windows-8-a-windows-phone-8.1
 title:
@@ -23,6 +40,24 @@ publisher:
     tagname: td
     data: Zoner Press
     required: true
+author:
+    tagname: td
+    required: true
+    data: |
+     Luboslav Lacko
+                        (<a href="http://www.zonerpress.cz/inshop/scripts/shop.aspx?action=DoSearch&limitedlevels=1&ParamID_1=Luboslav Lacko">Zobrazit všechny knihy tohoto autora</a>)
+pages:
+    tagname: td
+    data: 96 (papírová kniha)
+pub_date:
+    tagname: td
+    data: 2014 (e-kniha)
+ISBN:
+    tagname: td
+    data: 978-80-7413-282-7
+binding:
+    tagname: td
+    data: brožovaná
 ---
 html: http://www.zonerpress.cz/konec-prokrastinace
 title:
@@ -36,3 +71,21 @@ publisher:
     tagname: td
     data: Jan Melvil Publishing
     required: true
+author:
+    tagname: td
+    required: true
+    data: |
+     Petr Ludwig
+                        (<a href="http://www.zonerpress.cz/inshop/scripts/shop.aspx?action=DoSearch&limitedlevels=1&ParamID_1=Petr Ludwig">Zobrazit všechny knihy tohoto autora</a>)
+pages:
+    tagname: td
+    data: "272"
+pub_date:
+    tagname: td
+    data: "2013"
+ISBN:
+    tagname: td
+    data: 978-80-87270-51-6
+binding:
+    tagname: td
+    data: brožovaná s chlopněmi
