@@ -7,6 +7,11 @@
 import httpkie
 import dhtmlparser
 
+from .. import utils
+from harvester import structures
+
+import zonerpress_api as zapi
+
 
 # Variables ===================================================================
 BASE_URL = "http://www.zonerpress.cz"
@@ -88,4 +93,61 @@ def get_book_links(links):
     return book_links
 
 
-print get_book_list(LINKS)
+def _parse_authors(authors):
+    pass
+
+
+def _process_book(link):
+    data = DOWNER.download(link)
+    dom = dhtmlparser.parseString(
+        utils.handle_encodnig(data)
+    )
+    dhtmlparser.makeDoubleLinked(dom)
+
+    authors = _parse_authors(zapi.get_author(dom))
+    authors = [structures.Author("xex")]
+
+    pub = structures.Publication(
+        title=zapi.get_title(dom).getContent().strip(),
+        authors=authors,
+        price=zapi.get_price(dom).getContent().strip(),
+        publisher=zapi.get_publisher(dom).getContent().strip()
+    )
+
+
+    return pub
+
+
+def get_publications():
+    """
+    Get list of publication offered by ben.cz.
+
+    Returns:
+        list: List of :class:`structures.Publication` objects.
+    """
+    books = []
+    for link in get_book_links(LINKS):
+        books.append(
+            _process_book(link)
+        )
+
+        print books[0].to_namedtuple()
+        break
+
+    return books
+
+
+def self_test():
+    """
+    Perform basic selftest.
+
+    Returns:
+        True: When everything is ok.
+
+    Raises:
+        AssertionError: When there is some problem.
+    """
+    zapi.test_parsers()
+    return utils.self_test_idiom(get_publications)
+
+print get_publications()
