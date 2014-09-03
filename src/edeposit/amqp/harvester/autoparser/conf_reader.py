@@ -121,6 +121,11 @@ def read_config(file_name):
     )
     dirname = os.path.relpath(dirname)
 
+    # create utf-8 strings, not unicode
+    def custom_str_constructor(loader, node):
+        return loader.construct_scalar(node).encode('utf-8')
+    yaml.add_constructor(u'tag:yaml.org,2002:str', custom_str_constructor)
+
     config = []
     with open(file_name) as f:
         for item in yaml.load_all(f.read()):

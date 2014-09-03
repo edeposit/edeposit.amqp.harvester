@@ -5,7 +5,6 @@
 #
 # Imports =====================================================================
 import sys
-import copy
 import os.path
 import argparse
 
@@ -84,9 +83,20 @@ def _match_elements(dom, matches):
             transformer=lambda x: x.strip()
         )
 
-        not_found_msg = "Can't locate element with content '%s'!" % key
+        not_found_msg = "Can't locate variable %s with content '%s'!" % (
+            content["data"],
+            key
+        )
         if content.get("notfoundmsg"):
             not_found_msg = content.get("notfoundmsg").replace("$name", key)
+
+        # in case of multiple elements, find only elements with propert tagname
+        tagname = content.get("tagname", "").strip().lower()
+        if tagname:
+            matching_elements = filter(
+                lambda x: x.getTagName().strip().lower() == tagname,
+                matching_elements
+            )
 
         if not matching_elements:
             raise UserWarning(not_found_msg)
