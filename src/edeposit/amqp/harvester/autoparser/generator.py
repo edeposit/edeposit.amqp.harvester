@@ -333,15 +333,25 @@ def _unittest_template(config):
         output += IND + "dhtmlparser.makeDoubleLinked(dom)\n\n"
 
         for var in links[link]:
-            output += IND + "%s = %s(dom)\n" % (var, _get_parser_name(var))
-            output += IND + "assert %s.getContent().strip() == %s" % (
-                var,
-                repr(links[link][var]["data"].strip())
-            )
-            output += "\n\n"
-    output += "\n"
+            content = links[link][var]["data"].strip()
 
-    return output
+            output += IND + "%s = %s(dom)\n" % (var, _get_parser_name(var))
+
+            if "\n" in content:
+                output += IND
+                output += "assert %s.getContent().strip().split() == %s" % (
+                    var,
+                    repr(content.split())
+                )
+            else:
+                output += IND + "assert %s.getContent().strip() == %s" % (
+                    var,
+                    repr(content)
+                )
+
+            output += "\n\n"
+
+    return output + "\n"
 
 
 def generate_parsers(config, paths):

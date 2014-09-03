@@ -77,17 +77,24 @@ def _match_elements(dom, matches):
     """
     out = {}
     for key, content in matches.items():
+        pattern = content["data"].strip()
+        if "\n" in pattern:
+            pattern = pattern.split()
+            transformer = lambda x: x.strip().split()
+        else:
+            transformer = lambda x: x.strip()
+
         matching_elements = _locate_element(
             dom,
-            content["data"],
-            transformer=lambda x: x.strip()
+            pattern,
+            transformer=transformer
         )
 
         not_found_msg = content.get("notfoundmsg", "").replace("$name", key)
         if not not_found_msg.strip():
             not_found_msg = "Can't locate variable '%s' with content '%s'!" % (
                 key,
-                content["data"],
+                pattern,
             )
         content["notfoundmsg"] = not_found_msg
 
