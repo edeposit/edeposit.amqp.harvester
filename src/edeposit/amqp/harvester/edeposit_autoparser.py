@@ -83,12 +83,13 @@ def _match_elements(dom, matches):
             transformer=lambda x: x.strip()
         )
 
-        not_found_msg = "Can't locate variable %s with content '%s'!" % (
-            content["data"],
-            key
-        )
-        if content.get("notfoundmsg"):
-            not_found_msg = content.get("notfoundmsg").replace("$name", key)
+        not_found_msg = content.get("notfoundmsg", "").replace("$name", key)
+        if not not_found_msg.strip():
+            not_found_msg = "Can't locate variable '%s' with content '%s'!" % (
+                key,
+                content["data"],
+            )
+        content["notfoundmsg"] = not_found_msg
 
         # in case of multiple elements, find only elements with propert tagname
         tagname = content.get("tagname", "").strip().lower()

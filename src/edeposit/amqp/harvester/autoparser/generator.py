@@ -76,10 +76,12 @@ def _required_idiom(tag_name, index, notfoundmsg):
     if index > 0:
         cond = " or len(el) - 1 < %d" % index
 
+    tag_name = str(tag_name)
+
     output = IND + "if not el%s:\n" % cond
     output += IND + IND + "raise UserWarning(\n"
     output += IND + IND + IND + "%s +\n" % repr(notfoundmsg.strip() + "\n")
-    output += IND + IND + IND + "'Tag name: %s\\n' +\n" % tag_name
+    output += IND + IND + IND + repr("Tag name: " + tag_name) + " + '\\n' +\n"
     output += IND + IND + IND + "'El:' + str(el) + '\\n' +\n"
     output += IND + IND + IND + "'Dom:' + str(dom)\n"
     output += IND + IND + ")\n\n"
@@ -216,7 +218,11 @@ def _neigh_template(parameters, index, left=True, required=False,
     output += IND + ")\n\n"
 
     if required:
-        return output + _required_idiom(parameters[0], index, notfoundmsg)
+        return output + _required_idiom(
+            parameters.fn_params[0],
+            index,
+            notfoundmsg
+        )
 
     return output + _index_idiom("el", index)
 
@@ -377,7 +383,7 @@ import dhtmlparser
     output += "# Generated parsers\n"
 
     for name, path in paths.items():
-        path = path[-1]  # pick path with highest priority
+        path = path[0]  # pick path with highest priority
 
         required = config[0]["vars"][name].get("required", False)
         notfoundmsg = config[0]["vars"][name].get("notfoundmsg", "")
