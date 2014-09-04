@@ -1,5 +1,5 @@
-generator submodule
-===================
+generator
+=========
 
 .. automodule:: harvester.autoparser.generator
     :members:

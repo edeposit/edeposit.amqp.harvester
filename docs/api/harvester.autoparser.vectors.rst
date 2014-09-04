@@ -1,5 +1,5 @@
-vectors submodule
-=================
+vectors
+=======
 
 .. automodule:: harvester.autoparser.vectors
     :members:

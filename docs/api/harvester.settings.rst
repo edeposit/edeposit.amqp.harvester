@@ -1,5 +1,5 @@
-harvester.settings module
-=========================
+settings
+========
 
 .. automodule:: harvester.settings
     :members:

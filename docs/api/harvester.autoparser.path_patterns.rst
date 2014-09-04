@@ -1,5 +1,5 @@
-path_patterns submodule
-=======================
+path_patterns
+=============
 
 .. automodule:: harvester.autoparser.path_patterns
     :members:

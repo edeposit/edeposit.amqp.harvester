@@ -1,5 +1,5 @@
-harvester.structures module
-===========================
+structures
+==========
 
 .. automodule:: harvester.structures
     :members:

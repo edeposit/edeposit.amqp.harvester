@@ -1,5 +1,5 @@
-utils submodule
-===============
+utils
+=====
 
 .. automodule:: harvester.autoparser.utils
     :members:

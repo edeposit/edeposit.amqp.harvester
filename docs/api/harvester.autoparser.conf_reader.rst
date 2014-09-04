@@ -1,5 +1,5 @@
-conf_reader submodule
-=====================
+conf_reader
+===========
 
 .. automodule:: harvester.autoparser.conf_reader
     :members:
