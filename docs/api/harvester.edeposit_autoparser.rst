@@ -41,6 +41,9 @@ this variable, UserWarning exception is raised and ``notfoundmsg`` is used as
 message. As you can see in example, you can use ``$name`` as variable which
 holds variable name (`first` for example).
 
+There is also special keyword ``tagname``, which can be used to further specify
+correct element in case, that there is more than one element matching.
+
 How it works
 ------------
 Autoparser first reads all examples and locates elements, which content matching
