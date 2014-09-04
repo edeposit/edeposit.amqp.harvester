@@ -11,7 +11,7 @@ import httpkie
 import dhtmlparser
 
 from .. import utils
-from ..grada_cz import Publication, Author
+from ..__init__ import Publication, Author
 
 import zonerpress_api as zapi
 
@@ -189,11 +189,30 @@ def _process_book(link):
     )
     dhtmlparser.makeDoubleLinked(dom)
 
+    # some books are without price in expected elements, this will try to get
+    # it from elsewhere
+    price = None
+    try:
+        price = _strip_content(zapi.get_price(dom))
+    except UserWarning:
+        price = dom.find("p", {"class": "vaseCena"})
+
+        if price:
+            price = price[0].getContent().replace("&nbsp;", " ")
+            price = filter(lambda x: x.isdigit(), price.strip())
+
+            if price:
+                price = price[0] + "kč"
+            else:
+                price = "-1"
+        else:
+            price = "-1"
+
     # required informations
     pub = Publication(
         title=_strip_content(zapi.get_title(dom)),
         authors=_parse_authors(zapi.get_author(dom)),
-        price=_strip_content(zapi.get_price(dom)),
+        price=price,
         publisher=_strip_content(zapi.get_publisher(dom))
     )
 
@@ -209,11 +228,12 @@ def _process_book(link):
         pub.title = pub.title.replace("E-kniha:", "", 1).strip()
         pub.optionals.is_ebook = True
 
-    if " " in pub.optionals.ISBN:
-        pub.optionals.ISBN = pub.optionals.ISBN.split(" ")[0]
+    if pub.optionals.ISBN:
+        if " " in pub.optionals.ISBN:
+            pub.optionals.ISBN = pub.optionals.ISBN.split(" ")[0]
 
-    if "(" in pub.optionals.ISBN:
-        pub.optionals.ISBN = pub.optionals.ISBN.split("(")[0]
+        if "(" in pub.optionals.ISBN:
+            pub.optionals.ISBN = pub.optionals.ISBN.split("(")[0]
 
     return pub
 
@@ -227,7 +247,7 @@ def get_publications():
     """
     books = []
     for link in get_book_links(LINKS):
-        books.append(
+        books.append(        
             _process_book(link)
         )
 

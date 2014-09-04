@@ -211,8 +211,8 @@ def _process_book(html_chunk):
     Parse available informations about book from the book details page.
 
     Args:
-        html_chunk (obj): HTMLElement containing slice of the page with details.
-
+        html_chunk (obj): HTMLElement containing slice of the page with
+                          details.
 
     Returns:
         obj: :class:`structures.Publication` instance with book details.
