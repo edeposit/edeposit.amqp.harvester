@@ -3,12 +3,15 @@
 #
 # Interpreter version: python 2.7
 #
+"""
+Module for parsing informations from `zonerpress.cz`.
+"""
 # Imports =====================================================================
 import httpkie
 import dhtmlparser
 
 from .. import utils
-from harvester import structures
+from ..grada_cz import Publication, Author
 
 import zonerpress_api as zapi
 
@@ -29,6 +32,15 @@ DOWNER = httpkie.Downloader()
 
 # Functions & objects =========================================================
 def _get_max_page(dom):
+    """
+    Try to guess how much pages are in book listing.
+
+    Args:
+        dom (obj): HTMLElement container of the page with book list.
+
+    Returns:
+        int: Number of pages for given category.
+    """
     div = dom.find("div", {"class": "razeniKnihListovani"})
 
     if not div:
@@ -54,6 +66,15 @@ def _get_max_page(dom):
 
 
 def _parse_book_links(dom):
+    """
+    Parse links to the details about publications from page with book list.
+
+    Args:
+        dom (obj): HTMLElement container of the page with book list.
+
+    Returns:
+        list: List of strings / absolute links to book details.
+    """
     links = []
     picker = lambda x: x.params.get("class", "").startswith("boxProKnihy")
 
@@ -69,6 +90,16 @@ def _parse_book_links(dom):
 
 
 def get_book_links(links):
+    """
+    Go thru `links` to categories and return list to all publications in all
+    given categories.
+
+    Args:
+        links (list): List of strings (absolute links to categories).
+
+    Returns:
+        list: List of strings / absolute links to book details.
+    """
     book_links = []
 
     for link in links:
@@ -94,6 +125,16 @@ def get_book_links(links):
 
 
 def _strip_content(el):
+    """
+    Call ``.getContent()`` method of the `el` and strip whitespaces. Return
+    ``None`` if content is ``-``.
+
+    Args:
+        el (obj): HTMLElement instance.
+
+    Returns:
+        str/None: Clean string.
+    """
     content = el.getContent().strip()
 
     if content == "-":
@@ -103,6 +144,16 @@ def _strip_content(el):
 
 
 def _parse_authors(authors):
+    """
+    Parse informations about authors of the book.
+
+    Args:
+        dom (obj): HTMLElement containing slice of the page with details.
+
+    Returns:
+        list: List of :class:`.Author` objects. Blank if no author \
+              found.
+    """
     link = authors.find("a")
     link = link[0].params.get("href") if link else None
 
@@ -111,26 +162,42 @@ def _parse_authors(authors):
     if "(" in author_list:
         author_list = author_list.split("(")[0]
 
+    if not author_list.strip():
+        return []
+
     return map(
-        lambda author: structures.Author(author.strip(), link),
+        lambda author: Author(author.strip(), link),
         author_list.strip().split(",")
     )
 
 
 def _process_book(link):
+    """
+    Download and parse available informations about book from the publishers
+    webpages.
+
+    Args:
+        link (str): URL of the book at the publishers webpages.
+
+    Returns:
+        obj: :class:`.Publication` instance with book details.
+    """
+    # download and parse book info
     data = DOWNER.download(link)
     dom = dhtmlparser.parseString(
         utils.handle_encodnig(data)
     )
     dhtmlparser.makeDoubleLinked(dom)
 
-    pub = structures.Publication(
+    # required informations
+    pub = Publication(
         title=_strip_content(zapi.get_title(dom)),
         authors=_parse_authors(zapi.get_author(dom)),
         price=_strip_content(zapi.get_price(dom)),
         publisher=_strip_content(zapi.get_publisher(dom))
     )
 
+    # optional informations
     pub.optionals.URL = link
     pub.optionals.pages = _strip_content(zapi.get_pages(dom))
     pub.optionals.pub_date = _strip_content(zapi.get_pub_date(dom))
@@ -164,9 +231,6 @@ def get_publications():
             _process_book(link)
         )
 
-        print books[0].to_namedtuple()
-        break
-
     return books
 
 
@@ -182,5 +246,3 @@ def self_test():
     """
     zapi.test_parsers()
     return utils.self_test_idiom(get_publications)
-
-print get_publications()
