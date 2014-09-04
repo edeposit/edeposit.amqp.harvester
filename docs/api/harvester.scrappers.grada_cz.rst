@@ -4,4 +4,4 @@ grada.cz scrapper
 .. automodule:: harvester.scrappers.grada_cz
     :members:
     :undoc-members:
-    :show-inheritance:
+    :private-members:
