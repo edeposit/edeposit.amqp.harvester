@@ -9,6 +9,7 @@ import scrappers
 from scrappers import ben_cz
 from scrappers import grada_cz
 from scrappers import cpress_cz
+from scrappers import zonerpress_cz
 
 
 # Functions & objects =========================================================
@@ -28,6 +29,7 @@ def get_all_publications(return_namedtuples=True):
         ben_cz.get_publications,
         grada_cz.get_publications,
         cpress_cz.get_publications,
+        zonerpress_cz.get_publications,
     ]
 
     # get data from all scrappers
@@ -52,6 +54,9 @@ def self_test():
         None: None if everything is ok.
 
     Raises:
-        UserWarning: If failed.
+        UserWarning: If one of the tests fails.
     """
-    return scrappers.self_test_all()
+    ben_cz.self_test()
+    grada_cz.self_test()
+    cpress_cz.self_test()
+    zonerpress_cz.self_test()
