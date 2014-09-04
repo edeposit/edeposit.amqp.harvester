@@ -67,6 +67,7 @@ class Optionals(object):
         URL (str, default None): URL to the eshop with the book.
         binding (str, default None): Binding of the book (`brožovaná` for
                                      example).
+        is_ebook (bool, default False): If True, metadata belongs to ebook.
     """
     def __init__(self):
         self.sub_title = None
@@ -81,6 +82,7 @@ class Optionals(object):
         self.edition = None  # vydání
         self.URL = None
         self.binding = None
+        self.is_ebook = False
 
         self._any_set = False
         self._all_set = True
