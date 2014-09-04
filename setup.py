@@ -58,7 +58,7 @@ class BuildSphinx(sdist):
 setup(
     name='edeposit.amqp.harvester',
     version=getVersion(changelog),
-    description="Harvester of the published ebooks for E-Deposit project.",
+    description="Metadata harvester of the books printed by specific publishers.",
     long_description=long_description,
     url='https://github.com/edeposit/edeposit.amqp.harvester/',
 
@@ -97,5 +97,5 @@ setup(
         ]
     },
 
-    # cmdclass={'sdist': BuildSphinx}
+    cmdclass={'sdist': BuildSphinx}
 )
