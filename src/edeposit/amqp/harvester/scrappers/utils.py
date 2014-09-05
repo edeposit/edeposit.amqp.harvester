@@ -234,9 +234,6 @@ def self_test_idiom(fn):
         if book.optionals.ISBN:
             assert len(book.optionals.ISBN) >= 10
 
-        if book.optionals.pages:
-            assert len(book.optionals.pages) >= 1
-
         if book.optionals.URL:
             protocol, rest = book.optionals.URL.split(":", 1)
 
