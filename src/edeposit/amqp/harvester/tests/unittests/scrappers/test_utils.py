@@ -4,9 +4,11 @@
 # Interpreter version: python 2.7
 #
 # Imports =====================================================================
+import pytest
 import dhtmlparser
 
 from harvester.scrappers import utils, grada_cz
+from harvester.structures import Publication
 
 
 # Variables ===================================================================
@@ -23,6 +25,10 @@ SAUCE = """
     <container id="mycontent">and this</container>
     something something
     <blank id="xex" class="xax"> </blank>
+    <xex>
+        <bleh>asd</bleh>
+        <ppp>content </ppp>
+    </xex>
 </root>
 """
 
@@ -76,7 +82,10 @@ def test_has_param():
 
 
 def test_must_contain():
-    pass
+    dom = dhtmlparser.parseString(SAUCE)
+
+    cont = dom.find(None, fn=utils.must_contain("ppp", "content ", "bleh"))
+    assert cont[0] == dom.find("xex")[0]
 
 
 def test_content_matchs():
@@ -88,4 +97,31 @@ def test_content_matchs():
 
 
 def test_self_test_idiom():
-    pass
+    assert utils.self_test_idiom(
+        lambda: [
+            Publication("xex", [], "3", "garda"),
+            Publication("xex", [], "3", "garda")
+        ]
+    )
+
+    with pytest.raises(AssertionError):
+        pub = Publication("xex", [], "3", "garda")
+        pub.optionals.ISBN = "80-8605"
+
+        utils.self_test_idiom(
+            lambda: [
+                pub,
+                Publication("xex", [], "3", "garda")
+            ]
+        )
+
+    with pytest.raises(AssertionError):
+        pub = Publication("xex", [], "3", "garda")
+        pub.optionals.URL = "ftp://xexex"
+
+        utils.self_test_idiom(
+            lambda: [
+                pub,
+                Publication("xex", [], "3", "garda")
+            ]
+        )
