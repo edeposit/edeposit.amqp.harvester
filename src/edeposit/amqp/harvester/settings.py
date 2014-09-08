@@ -40,7 +40,7 @@ USE_ALEPH_FILTER = True
 ALEPH_FILTER_BY_AUTHOR = True
 
 #: Cache for the deduplicator.
-DUP_FILTER_FILE = "/var/cache/edeposit_harvester/cache.json"
+DUP_FILTER_FILE = "~/.edeposit_harvester_cache.json"
 
 
 # User configuration reader (don't edit this ==================================
@@ -106,3 +106,6 @@ if "HOME" in os.environ and os.path.exists(os.environ["HOME"] + _SETTINGS_PATH):
 elif os.path.exists("/etc" + _SETTINGS_PATH):
     with open("/etc" + _SETTINGS_PATH) as f:
         substitute_globals(json.loads(f.read()))
+
+# replace ~ with the name of the user's home directory
+DUP_FILTER_FILE = os.path.expanduser(DUP_FILTER_FILE)
