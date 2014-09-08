@@ -4,6 +4,15 @@ edeposit.amqp.harvester
 This module is used to collect public metadata about new books published by
 selected czech publishers.
 
+User guide / Uživatelská příručka
+---------------------------------
+
+.. toctree::
+    :maxdepth: 1
+
+    /uzivatelska_prirucka
+
+
 Scripts
 -------
 
