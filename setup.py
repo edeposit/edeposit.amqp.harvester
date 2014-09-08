@@ -75,7 +75,9 @@ setup(
     packages=find_packages('src'),
     package_dir={'': 'src'},
 
-    # scripts=[''],
+    scripts=[
+        'bin/edeposit_harvester_test.py'
+    ],
 
     namespace_packages=['edeposit', 'edeposit.amqp'],
     include_package_data=True,
