@@ -11,7 +11,7 @@ function show_help {
     echo -e "\t-a"
     echo -e "\t\tRun all tests."
     echo -e "\t-i"
-    echo -e "\t\tRun integration test (requires sudo)."
+    echo -e "\t\tRun integration test."
     echo -e "\t-u"
     echo -e "\t\tRun unittest."
     echo
