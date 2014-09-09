@@ -1,30 +1,79 @@
-package scrappers {
-    class "grada_cz.py" as grada
-    class "ben_cz.py" as ben
-    class "zonerpress_cz.py" as zonerpress
-    class "cpress_cz.py" as cpress
-    class "_​_init__.py" as scrappersinit
+package scrappers/ {
+    class scrappers_init as "_​_init__.py" <<M, Green>> {
+    }
+    class ben_cz as "ben_cz.py" {
+    }
+    class cpress_cz as "cpress_cz.py" {
+    }
+    class grada_cz as "grada_cz.py" {
+    }
+    class scrrappers_utils as "utils.py" {
+    }
+    package zonerpress_cz {
+        class zonerapi as "zonerpress_api.py" {
+        }
+        class zoner_init as "_​_init__.py" <<M, Green>> {
+        }
+    }
+}
+zonerapi -u-> zoner_init
+zoner_init -u-> scrappers_init
+ben_cz -u-> scrappers_init
+cpress_cz -l-> scrappers_init
+grada_cz -u-> scrappers_init
+scrrappers_utils -r-> scrappers_init
 
-    cpress -u-> scrappersinit
-    zonerpress -u-> scrappersinit
-    grada -d-> scrappersinit
-    ben -d-> scrappersinit
+package filters/ {
+    class filtersinit as "_​_init__.py" <<M, Green>> {
+    }
+    class aleph_filter as "aleph_filter.py" {
+    }
+    class dup_filter as "dup_filter.py" {
+    }
+}
+aleph_filter -u-> filtersinit
+dup_filter -u-> filtersinit
+
+package autoparser/ {
+    class autoparser_init as "_​_init__.py" <<M, Green>> {
+    }
+    class conf_reader as "conf_reader.py" {
+    }
+    class generator as "generator.py" {
+    }
+    class path_patterns as "path_patterns.py" {
+    }
+    class autoparser_utils as "utils.py" {
+    }
+    class vectors as "vectors.py" {
+    }
+}
+conf_reader -u-> autoparser_init
+generator -u-> autoparser_init
+path_patterns -u-> autoparser_init
+autoparser_utils -l-> autoparser_init
+vectors -r-> autoparser_init
+
+
+class init as "_​_init__.py" <<M, Green>> {
+}
+class settings as "settings.py" {
+}
+class structures as "structures.py" {
 }
 
-package filters {
-    class "aleph_filter.py" as alephfilter
-    class "dup_filter.py" as dupfilter
-    class "_​_init__.py" as filtersinit
-    
-    alephfilter -u-> filtersinit
-    dupfilter -u-> filtersinit
+
+filtersinit -u--> init
+scrappers_init -u--> init
+structures -r-> init
+settings -l-> init
+
+package scripts {
+    class edeposit_harvester_test as "edeposit_harvester_test.py" <<S, Red>> {
+    }
+    class edeposit_autoparser as "edeposit_autoparser.py" <<S, Red>> {
+    }
 }
 
-class "settings.py" as settings
-class "structures.py" as structures
-class "_​_init__.py" as init
-
-filtersinit -u-> init
-scrappersinit -u-> init
-settings -r-> init
-structures -l-> init
+init -u----> edeposit_harvester_test
+autoparser_init -l--> edeposit_autoparser

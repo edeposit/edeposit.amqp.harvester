@@ -4,6 +4,9 @@ edeposit.amqp.harvester
 This module is used to collect public metadata about new books published by
 selected czech publishers.
 
+.. image:: /_static/relations.png
+    :width: 600px
+
 User guide / Uživatelská příručka
 ---------------------------------
 

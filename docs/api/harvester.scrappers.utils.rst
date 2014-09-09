@@ -1,5 +1,5 @@
-harvester.scrappers.utils module
-=====================================
+utils submodule
+===============
 
 .. automodule:: harvester.scrappers.utils
     :members:
