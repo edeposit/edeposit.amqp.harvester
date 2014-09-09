@@ -3,10 +3,6 @@
 #
 # Interpreter version: python 2.7
 #
-"""
-Tesct script used to show output of all downloaded data.
-(https://github.com/edeposit/edeposit.amqp.harvester/)
-"""
 # Imports =====================================================================
 import os
 import os.path
@@ -17,7 +13,7 @@ import argparse
 # if the amqp module wasn't yet installed at this system, load it from package
 try:
     import edeposit.amqp.harvester as harvester
-except ImportError:
+except (ImportError, AttributeError):
     sys.path.insert(0, os.path.abspath('../src/edeposit/amqp'))
     import harvester
 

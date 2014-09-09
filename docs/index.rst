@@ -20,6 +20,7 @@ Scripts
     :maxdepth: 1
 
     /api/harvester.edeposit_autoparser
+    /scripts/edeposit_harvester_test
 
 API
 ---
