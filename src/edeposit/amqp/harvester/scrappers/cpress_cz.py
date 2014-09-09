@@ -256,10 +256,10 @@ def _process_book(html_chunk):
 
     # optional parameters
     pub.optionals.URL = book_url
-    pub.optionals.EAN = _parse_ean(html_chunk)
-    pub.optionals.format = _parse_format(html_chunk)
-    pub.optionals.pub_date = _parse_date(html_chunk)
-    pub.optionals.description = _parse_description(html_chunk)
+    pub.optionals.EAN = _parse_ean(details)
+    pub.optionals.format = _parse_format(details)
+    pub.optionals.pub_date = _parse_date(details)
+    pub.optionals.description = _parse_description(details)
 
     return pub
 
