@@ -247,7 +247,7 @@ def get_publications():
     """
     books = []
     for link in get_book_links(LINKS):
-        books.append(        
+        books.append(
             _process_book(link)
         )
 
