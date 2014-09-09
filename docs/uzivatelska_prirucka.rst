@@ -18,6 +18,16 @@ Podobně jako ostatní prvky projektu Edeposit je i tento modul součástí asyn
 
 Spuštěním tohoto scriptu dochází k "sklizení" dat ze všech podporovaných komponent a jejich odeslání na AMQP fronty tak, jak je to definováno v souboru ``settingy.py`` modulu `edeposit.amqp`. Data jsou odesílána ve formátu struktury :class:`.Publications`, která ve svém těle nese pole struktur :class:`.Publication` se sklizenými metadaty.
 
+Filtrace dat
+++++++++++++
+Modul umožňuje a v základu používá filtraci již zpracovaných záznamů. V tomto režimu jsou všechny stažené výsledky porovnávány vůči lokální databázi (viz soubor definovaný v :attr:`harvester.settings.DUP_FILTER_FILE`) a odesílány jsou pouze ty, které ještě nebyly zpracovány.
+
+Toto chování je možné změnit nastavením konfigurační proměnné :attr:`harvester.settings.USE_DUP_FILTER` na hodnotu ``False``.
+
+Dostupný je také filtr, který výsledky porovnává vůči Alephu a propouští pouze ty záznamy, které zatím Aleph neobsahuje.
+
+Tento filtr je v základě vypnut aby se předešlo zbytečné zátěži Alephu. Zapnout toto chování je možné nastavením konfigurační proměnné :attr:`harvester.settings.USE_ALEPH_FILTER` na hodnotu ``True``.
+
 Testovací script
 ----------------
 Pro potřeby uživatelského testování byl v modulu `edeposit.amqp.harvester` vytvořen testovací script, který "sklidí" všechna data a zobrazí je na standardní výstup.
