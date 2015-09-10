@@ -13,11 +13,11 @@ import argparse
 # if the amqp module wasn't yet installed at this system, load it from package
 try:
     import edeposit.amqp.harvester as harvester
+    from edeposit.amqp.harvester.structures import Publications
 except (ImportError, AttributeError):
     sys.path.insert(0, os.path.abspath('../src/edeposit/amqp'))
     import harvester
-
-from harvester.structures import Publications
+    from harvester.structures import Publications
 
 
 # disable filtering for test purposes
