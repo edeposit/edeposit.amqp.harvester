@@ -1,3 +1,8 @@
-include CONTRIBUTORS.rst CHANGES.rst README.rst LICENSE.txt
+include README.rst
+include CHANGELOG.rst
+include CONTRIBUTORS.rst
+include LICENSE.txt
+
+recursive-include docs *.rst *.py Makefile make.bat
+recursive-include bin *
 recursive-exclude src/edeposit/amqp/harvester/tests *
-recursive-include html_docs *

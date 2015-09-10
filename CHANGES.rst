@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.0.1
+-----
+    - Fixed bug in ``edeposit_harvester_test.py`` script.
+    - Licence changed from GPL2+ to MIT.
+
 1.0.0
 -----
     - First working version.
